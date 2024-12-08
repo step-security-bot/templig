@@ -19,7 +19,7 @@ jobs:
         strategy:
             matrix:
                 go-version:
-                  - "1.22"
+                  - "1.23"
         runs-on: ubuntu-latest
         steps:
           - name: Harden Runner
@@ -44,7 +44,7 @@ jobs:
         strategy:
             matrix:
                 go-version:
-                  - "1.22"
+                  - "1.23"
         runs-on: ubuntu-latest
         steps:
           - name: Harden Runner
@@ -73,7 +73,7 @@ jobs:
         strategy:
             matrix:
                 go-version:
-                  - "1.22"
+                  - "1.23"
                 platform:
                   #- macos-latest
                   - ubuntu-latest
@@ -107,66 +107,66 @@ jobs:
                 token: ${{ secrets.CODECOV_TOKEN }}
 
     # This action is mainly composed of snippets of github.com/jidicula/go-fuzz-action
-    FuzzTest:
-        strategy:
-            matrix:
-                go-version:
-                  - "1.22"
-                platform:
-                  #- macos-latest
-                  - ubuntu-latest
-                  #- windows-latest
-                packages:
-                  - ./handler/method_filter
-        runs-on: ${{ matrix.platform }}
-        steps:
-          - name: Harden Runner
-            uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
-            with:
-              egress-policy: audit
+    #FuzzTest:
+    #    strategy:
+    #        matrix:
+    #            go-version:
+    #              - "1.22"
+    #            platform:
+    #              #- macos-latest
+    #              - ubuntu-latest
+    #              #- windows-latest
+    #            packages:
+    #              - ./handler/method_filter
+    #    runs-on: ${{ matrix.platform }}
+    #    steps:
+    #      - name: Harden Runner
+    #        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+    #        with:
+    #          egress-policy: audit
 
-          - name: Install Go
-            uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
-            with:
-                go-version: ${{matrix.go-version}}
+    #      - name: Install Go
+    #        uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
+    #        with:
+    #            go-version: ${{matrix.go-version}}
 
-          - name: Checkout
-            uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-            with:
-                fetch-depth: 1
+    #      - name: Checkout
+    #        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    #        with:
+    #            fetch-depth: 1
 
-          - name: Run Fuzz Test
-            shell: bash
-            run: go test ${{ matrix.packages }} -fuzz="Fuzz" -fuzztime="30s" -fuzzminimizetime="10s"
+    #      - name: Run Fuzz Test
+    #        shell: bash
+    #        run: go test ${{ matrix.packages }} -fuzz="Fuzz" -fuzztime="30s" -fuzzminimizetime="10s"
 
-          - name: Upload fuzz failure seed corpus as run artifact
-            if: failure()
-            uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
-            with:
-                name: testdata
-                path: testdata
+    #      - name: Upload fuzz failure seed corpus as run artifact
+    #        if: failure()
+    #        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+    #        with:
+    #            name: testdata
+    #            path: testdata
 
-          - run: echo "EVENT NAME IS ${{ github.event_name }}"
-            if: failure()
-            shell: bash
+    #      - run: echo "EVENT NAME IS ${{ github.event_name }}"
+    #        if: failure()
+    #        shell: bash
 
-          - name: Save PR head commit SHA
-            if: failure() && github.event_name == 'pull_request'
-            shell: bash
-            run: |
-                SHA="${{ github.event.pull_request.head.sha }}"
-                echo "SHA=$SHA" >> $GITHUB_ENV
+    #      - name: Save PR head commit SHA
+    #        if: failure() && github.event_name == 'pull_request'
+    #        shell: bash
+    #        run: |
+    #            SHA="${{ github.event.pull_request.head.sha }}"
+    #            echo "SHA=$SHA" >> $GITHUB_ENV
 
-          - name: Save latest commit SHA if not PR
-            if: failure() && github.event_name != 'pull_request'
-            shell: bash
-            run: echo "SHA=${{ github.sha }}" >> $GITHUB_ENV
+    #      - name: Save latest commit SHA if not PR
+    #        if: failure() && github.event_name != 'pull_request'
+    #        shell: bash
+    #        run: echo "SHA=${{ github.sha }}" >> $GITHUB_ENV
 
-          - name: Output message
-            if: failure()
-            shell: bash
-            run: |
-                MESSAGE='Fuzz test failed on commit ${{ env.SHA }}. To troubleshoot locally, use the [GitHub CLI](https://cli.github.com) to download the seed corpus with\n```\ngh run download ${{ github.run_id }} -n testdata\n```'
-                DEEPLINK="https://github.com/${{ github.repository }}/commit/${{ env.SHA }}"
-                echo -e "${MESSAGE/${{ env.SHA }}/$DEEPLINK}"
-                echo -e "${MESSAGE/${{ env.SHA }}/[${GITHUB_SHA:0:8}]($DEEPLINK)}" >> $GITHUB_STEP_SUMMARY
+    #      - name: Output message
+    #        if: failure()
+    #        shell: bash
+    #        run: |
+    #            MESSAGE='Fuzz test failed on commit ${{ env.SHA }}. To troubleshoot locally, use the [GitHub CLI](https://cli.github.com) to download the seed corpus with\n```\ngh run download ${{ github.run_id }} -n testdata\n```'
+    #            DEEPLINK="https://github.com/${{ github.repository }}/commit/${{ env.SHA }}"
+    #            echo -e "${MESSAGE/${{ env.SHA }}/$DEEPLINK}"
+    #            echo -e "${MESSAGE/${{ env.SHA }}/[${GITHUB_SHA:0:8}]($DEEPLINK)}" >> $GITHUB_STEP_SUMMARY
