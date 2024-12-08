@@ -242,7 +242,7 @@ func TestReadConfig(t *testing.T) {
 		}
 
 		if test.env != nil {
-			for ei, _ := range test.env {
+			for ei := range test.env {
 				_ = os.Unsetenv(ei)
 			}
 		}
