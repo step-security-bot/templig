@@ -1,3 +1,6 @@
+// Copyright the templig contributors.
+// SPDX-License-Identifier: MPL-2.0
+
 package templig
 
 import (

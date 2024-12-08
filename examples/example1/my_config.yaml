@@ -1,3 +1,6 @@
+# Copyright the templig contributors.
+# SPDX-License-Identifier: MPL-2.0
+
 id:   23
 name: Interesting Name
 pass: {{ env "PASSWORD" | required "PASSWORD required" | quote }}
