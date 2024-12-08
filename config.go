@@ -20,10 +20,6 @@ type Config[T any] struct {
 
 // Get gives a pointer to the deserialized configuration.
 func (c *Config[T]) Get() *T {
-	if c == nil {
-		return nil
-	}
-
 	return &c.content
 }
 

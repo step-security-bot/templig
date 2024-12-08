@@ -249,21 +249,13 @@ func TestReadConfig(t *testing.T) {
 	}
 }
 
-func TestEmptyGet(t *testing.T) {
-	var c *Config[TestConfig]
-
-	if c.Get() != nil {
-		t.Errorf("get on nil config should return nil")
-	}
-}
-
 type BrokenIO struct{}
 
-func (b *BrokenIO) Read(p []byte) (n int, err error) {
+func (b *BrokenIO) Read(_ []byte) (n int, err error) {
 	return 0, errors.New("broken reader")
 }
 
-func (b *BrokenIO) Write(p []byte) (n int, err error) {
+func (b *BrokenIO) Write(_ []byte) (n int, err error) {
 	return 0, errors.New("broken writer")
 }
 

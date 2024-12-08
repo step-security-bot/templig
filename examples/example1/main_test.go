@@ -7,7 +7,7 @@ import (
 
 func TestMainGood(t *testing.T) {
 	os.Args = []string{"main"}
-	os.Setenv("PASSWORD", "bogus")
+	_ = os.Setenv("PASSWORD", "bogus")
 	main()
 }
 
