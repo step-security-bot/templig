@@ -27,7 +27,7 @@
     <a href="https://codecov.io/github/AlphaOne1/templig"
        rel="external"
        target="_blank">
-        <img src="https://codecov.io/github/AlphaOne1/templig/graph/badge.svg?token=X58EXDA6I9"
+        <img src="https://codecov.io/github/AlphaOne1/templig/graph/badge.svg?token=P18EOCUPU8"
              alt="Code Coverage">
     </a>
     <a href="https://www.bestpractices.dev/projects/9251"
