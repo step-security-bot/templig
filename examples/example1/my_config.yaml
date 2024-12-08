@@ -1,0 +1,3 @@
+id:   23
+name: Interesting Name
+pass: {{ env "PASSWORD" | required "PASSWORD required" | quote }}

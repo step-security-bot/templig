@@ -1,0 +1,7 @@
+id: 9
+name: Name1
+conn:
+    url: http://www.tests.to
+    passes:
+      - pass0
+      - {{ env "PASS1" | required "PASS1 must be set" | quote }}
