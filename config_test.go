@@ -327,6 +327,10 @@ func TestWriteFile(t *testing.T) {
 func TestWriteProtectedFile(t *testing.T) {
 	c, _ := FromFile[TestConfig]("testData/test_config_0.yaml")
 
+	if chmodErr := os.Chmod("testData/test_writeprotected.yaml", 0400); chmodErr != nil {
+		t.Errorf("could not writeprotect file for test: %v", chmodErr)
+	}
+
 	err := c.ToFile("testData/test_writeprotected.yaml")
 
 	if err == nil {
