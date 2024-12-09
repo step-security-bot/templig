@@ -5,8 +5,9 @@ package templig
 
 import (
 	"bytes"
-	"gopkg.in/yaml.v3"
 	"testing"
+
+	"gopkg.in/yaml.v3"
 )
 
 func TestHideSecrets(t *testing.T) {
