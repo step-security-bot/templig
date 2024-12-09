@@ -66,7 +66,7 @@ templig
 =======
 
 *templig* is configuration library utilizing the text templating engine and the functions best known from helm charts,
-that originally stem from [Masterminds/sprig](http://github.com/Masterminds/sprig/v3).
+that originally stem from [Masterminds/sprig](http://github.com/Masterminds/sprig).
 Its primary goal is to enable access to the system environment to fill information using the `env` function. It also
 enables to include verifications inside the configuration.
 
@@ -124,7 +124,7 @@ pass: {{ env "PASSWORD" | required "password required" | quote }}
 ```
 
 As demonstrated, one can use the templating functionality that is best known from helm charts. The functions provided
-come from the aforementioned [strig](http://github.com/Masterminds/strig/v3)-library.
+come from the aforementioned [sprig](http://github.com/Masterminds/sprig)-library.
 
 ```go
 package main
