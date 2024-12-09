@@ -109,7 +109,7 @@ func main() {
 }
 ```
 
-The `Get` method gives a pointer to the internally held Config strucutre that the use supplied. The pinter is always
+The `Get` method gives a pointer to the internally held Config structure that the use supplied. The pinter is always
 non-nil, so additional nil-checks are not necessary.
 
 ### Advanced Case
@@ -123,7 +123,7 @@ pass: {{ env "PASSWORD" | required "password required" | quote }}
 ```
 
 As demonstrated, one can use the templating functionality that is best known from helm charts. The functions provided
-come from the aforementionened [strig](http://github.com/Masterminds/strig/v3)-library.
+come from the aforementioned [strig](http://github.com/Masterminds/strig/v3)-library.
 
 ```go
 package main
