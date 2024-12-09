@@ -30,12 +30,12 @@
         <img src="https://codecov.io/github/AlphaOne1/templig/graph/badge.svg?token=P18EOCUPU8"
              alt="Code Coverage">
     </a>
-    <!--<a href="https://www.bestpractices.dev/projects/9251"
+    <a href="https://www.bestpractices.dev/projects/9251"
        rel="external"
        target="_blank">
-        <img src="https://www.bestpractices.dev/projects/9251/badge"
+        <img src="https://www.bestpractices.dev/projects/9789/badge"
              alt="OpenSSF Best Practises">
-    </a>-->
+    </a>
     <a href="https://scorecard.dev/viewer/?uri=github.com/AlphaOne1/templig"
        rel="external"
        target="_blank">
