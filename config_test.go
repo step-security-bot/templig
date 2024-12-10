@@ -346,3 +346,29 @@ func TestSecretsHidden(t *testing.T) {
 		t.Errorf("found secrets in normally secrets-hidden output")
 	}
 }
+
+func FuzzFromFileEnv(f *testing.F) {
+	f.Add("")
+	f.Add("12345")
+	f.Add("123456")
+	f.Add("1234567")
+	f.Add("pass")
+	f.Add("password")
+	f.Add("qwerty")
+	f.Add("secret")
+	f.Add("test")
+
+	f.Fuzz(func(t *testing.T, envVar string) {
+		if setEnvErr := os.Setenv("PASS1", envVar); setEnvErr != nil {
+			return
+		}
+
+		_, confErr := FromFile[TestConfig]("testData/test_config_1.yaml")
+
+		if confErr != nil && len(envVar) > 0 {
+			t.Errorf("got unexpected error on input -%v-: %v", envVar, confErr)
+		}
+
+		_ = os.Unsetenv("PASS1")
+	})
+}
