@@ -3,6 +3,9 @@
 
 package main
 
+// This example demonstrates the use of the `env` functions in a templated configuration.
+// The use of the `required` function is demonstrated in conjunction with `env`.
+
 import (
 	"fmt"
 	"strings"
@@ -10,6 +13,7 @@ import (
 	"github.com/AlphaOne1/templig"
 )
 
+// Config is the configuration structure that is to be filled by templig.
 type Config struct {
 	ID   int    `yaml:"id"`
 	Name string `yaml:"name"`
@@ -19,7 +23,7 @@ type Config struct {
 func main() {
 	c, confErr := templig.FromFile[Config]("my_config.yaml")
 
-	fmt.Printf("read errors: %v", confErr)
+	fmt.Printf("read errors: %v\n", confErr)
 
 	if confErr == nil {
 		fmt.Printf("ID:   %v\n", c.Get().ID)

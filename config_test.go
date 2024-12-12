@@ -6,6 +6,7 @@ package templig
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"os"
 	"slices"
 	"strings"
@@ -178,6 +179,21 @@ func TestReadConfig(t *testing.T) {
 				},
 			},
 			wantErr: false,
+		},
+		{ // 12
+			inFile: "testData/test_config_2.yaml",
+			want: TestConfig{
+				ID:   9,
+				Name: "Name1",
+				Conn: &TestConn{
+					URL: "http://www.tests.to",
+					Passes: []string{
+						"pass0",
+						"cannot_work",
+					},
+				},
+			},
+			wantErr: true,
 		},
 	}
 
@@ -371,4 +387,97 @@ func FuzzFromFileEnv(f *testing.F) {
 
 		_ = os.Unsetenv("PASS1")
 	})
+}
+
+type TestConfigValidated struct {
+	ID   int    `yaml:"id"`
+	Name string `yaml:"name"`
+}
+
+func (c *TestConfigValidated) Validate() error {
+	if c.ID == 9 {
+		return nil
+	} else {
+		return fmt.Errorf("expected id 9 to be valid")
+	}
+}
+func TestReadConfigValidated(t *testing.T) {
+	tests := []struct {
+		in      string
+		inFile  string
+		env     map[string]string
+		want    TestConfigValidated
+		wantErr bool
+	}{
+		{ // 0
+			in: `
+                id:   8
+                name: "Name0"`,
+			want: TestConfigValidated{
+				ID:   8,
+				Name: "Name0",
+			},
+			wantErr: true,
+		},
+		{ // 1
+			in: `
+                id:   9
+                name: "Name0"`,
+			want: TestConfigValidated{
+				ID:   9,
+				Name: "Name0",
+			},
+			wantErr: false,
+		},
+	}
+
+	testBuf := bytes.Buffer{}
+
+	for k, test := range tests {
+		if len(test.in) > 0 && len(test.inFile) > 0 {
+			t.Errorf("%v: input data and file given at the same time", k)
+		}
+
+		testBuf.Reset()
+		testBuf.WriteString(test.in)
+
+		if test.env != nil {
+			for ei, ev := range test.env {
+				_ = os.Setenv(ei, ev)
+			}
+		}
+
+		var c *Config[TestConfigValidated]
+		var fromErr error
+
+		if len(test.in) > 0 {
+			c, fromErr = From[TestConfigValidated](&testBuf)
+		} else if len(test.inFile) > 0 {
+			c, fromErr = FromFile[TestConfigValidated](test.inFile)
+		} else {
+			t.Errorf("%v: neither input data nor input file given", k)
+		}
+
+		if test.wantErr && fromErr == nil {
+			t.Errorf("%v: wanted error but got nil", k)
+		}
+		if !test.wantErr && fromErr != nil {
+			t.Errorf("%v: did not want error but got %v", k, fromErr)
+		}
+
+		if c != nil {
+			if c.Get().ID != test.want.ID {
+				t.Errorf("%v: wanted ID %v but got %v", k, test.want.ID, c.Get().ID)
+			}
+			if c.Get().Name != test.want.Name {
+				t.Errorf("%v: wanted Name %v but got %v", k, test.want.Name, c.Get().Name)
+			}
+		}
+
+		if test.env != nil {
+			for ei := range test.env {
+				_ = os.Unsetenv(ei)
+			}
+		}
+	}
 }

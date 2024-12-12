@@ -1,0 +1,51 @@
+// Copyright the templig contributors.
+// SPDX-License-Identifier: MPL-2.0
+
+package main
+
+// This example demonstrates the use of the validation functionality.
+
+import (
+	"errors"
+	"fmt"
+
+	"github.com/AlphaOne1/templig"
+)
+
+// Config is the configuration structure that is to be filled by templig.
+type Config struct {
+	ID   int    `yaml:"id"`
+	Name string `yaml:"name"`
+}
+
+// Validate fulfills the Validator interface provided by templig.
+// This method is called, if it is defined. It influences the outcome of the configuration reading.
+func (c *Config) Validate() error {
+	result := make([]error, 0)
+
+	if len(c.Name) == 0 {
+		result = append(result, errors.New("name is required"))
+	}
+
+	if c.ID < 0 {
+		result = append(result, errors.New("id greater than zero is required"))
+	}
+
+	return errors.Join(result...)
+}
+
+func main() {
+	_, confErr := templig.FromFile[Config]("my_config_bad.yaml")
+
+	// read errors bad config: name is required
+	fmt.Printf("read errors bad config: %v\n", confErr)
+
+	c, confErr := templig.FromFile[Config]("my_config_good.yaml")
+
+	fmt.Printf("read errors good config: %v\n", confErr)
+
+	if confErr == nil {
+		fmt.Printf("ID:   %v\n", c.Get().ID)
+		fmt.Printf("Name: %v\n", c.Get().Name)
+	}
+}

@@ -113,7 +113,7 @@ func main() {
 The `Get` method gives a pointer to the internally held Config structure that the use supplied. The pinter is always
 non-nil, so additional nil-checks are not necessary.
 
-### Advanced Case
+### Reading environment
 
 Having a templated configuration file like this one:
 
@@ -123,8 +123,22 @@ name: Interesting Name
 pass: {{ env "PASSWORD" | required "password required" | quote }}
 ```
 
+or this one;
+
+```yaml
+id:   23
+name: Interesting Name
+pass: {{ read "pass.txt" | required "password required" | quote }}
+```
+
 As demonstrated, one can use the templating functionality that is best known from helm charts. The functions provided
-come from the aforementioned [sprig](http://github.com/Masterminds/sprig)-library.
+come from the aforementioned [sprig](http://github.com/Masterminds/sprig)-library. For convenience *templig* also
+provides further functionality:
+
+| Function | Description                                               |
+|----------|-----------------------------------------------------------|
+| required | checks that its second argument is not zero length or nil |
+| read     | reads the content of a file                               |
 
 ```go
 package main
@@ -154,3 +168,63 @@ func main() {
 	}
 }
 ```
+
+### Validation
+
+The templating facilities allow also for a wide range of tests, but depend on the configuration file read. As it is most
+like user supplied, possible consistency checks are not reliable in the form of template code.
+For this purpose, *templig* also allows for the configuration structure to implement the `Validator` interface.
+Implementing types provide a function `Validate` that allows *templig* to check __after__ the configuration was read, if
+its structure could be considered valid and report errors accordingly.
+
+```go
+package main
+
+import (
+    "errors"
+    "fmt"
+
+	"github.com/AlphaOne1/templig"
+)
+
+type Config struct {
+    ID   int    `yaml:"id"`
+    Name string `yaml:"name"`
+}
+
+// Validate fulfills the Validator interface provided by templig.
+// This method is called, if it is defined. It influences the outcome of the configuration reading.
+func (c *Config) Validate() error {
+    result := make([]error, 0)
+
+	if len(c.Name) == 0 {
+		result = append(result, errors.New("name is required"))
+	}
+
+	if c.ID < 0 {
+		result = append(result, errors.New("id greater than zero is required"))
+	}
+
+	return errors.Join(result...)
+}
+
+func main() {
+	c, confErr := templig.FromFile[Config]("my_config_good.yaml")
+
+	if confErr == nil {
+		fmt.Printf("ID:   %v\n", c.Get().ID)
+		fmt.Printf("Name: %v\n", c.Get().Name)
+	}
+}
+```
+
+Validation functionality can be as simple as in this example. But as the complexity of the configuration grows,
+automated tools to generate the configuration structure and basic consistency checks could be employed. These use
+JSON Schema or its embedded form in OpenAPI 2 or 3.
+
+A non-exhaustive list of these:
+
+* https://github.com/omissis/go-jsonschema (JSON Schema)
+* https://github.com/ogen-go/ogen (OpenAPI 3.x)
+* https://github.com/go-swagger/go-swagger (OpenAPI 2.0 / Swagger 2.0)
+ 

@@ -1,0 +1,6 @@
+# Copyright the templig contributors.
+# SPDX-License-Identifier: MPL-2.0
+
+id:   23
+name: Interesting Name
+pass: {{ read "secret.txt" | required "secret from secret.txt required" | quote }}

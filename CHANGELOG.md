@@ -1,3 +1,10 @@
+Release 0.2.0
+=============
+
+- added `read` function to read file contents
+- added `Validator` interface so that configurations can
+  be checked for validity when they are being loaded
+
 Release 0.1.0
 =============
 

@@ -3,12 +3,16 @@
 
 package main
 
+// This example demonstrates the basic function of templig,
+// namely the reading and deserialization of configuration files into an arbitrary data structure.
+
 import (
 	"fmt"
 
 	"github.com/AlphaOne1/templig"
 )
 
+// Config is the configuration structure that is to be filled by templig.
 type Config struct {
 	ID   int    `yaml:"id"`
 	Name string `yaml:"name"`
@@ -17,7 +21,7 @@ type Config struct {
 func main() {
 	c, confErr := templig.FromFile[Config]("my_config.yaml")
 
-	fmt.Printf("read errors: %v", confErr)
+	fmt.Printf("read errors: %v\n", confErr)
 
 	if confErr == nil {
 		fmt.Printf("ID:   %v\n", c.Get().ID)

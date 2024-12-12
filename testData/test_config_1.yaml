@@ -6,5 +6,5 @@ name: Name1
 conn:
     url: http://www.tests.to
     passes:
-      - pass0
+      - {{ read "testData/secret.txt" | required "secret.txt must be readable" | quote }}
       - {{ env "PASS1" | required "PASS1 must be set" | quote }}

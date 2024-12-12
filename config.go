@@ -13,6 +13,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// Validator is the interface to facility validity checks on configuration types.
+type Validator interface {
+	// Validate is used to validate a configuration.
+	Validate() error
+}
+
 // Config is the generic structure holding the configuration information for the specified type.
 type Config[T any] struct {
 	content T
@@ -47,7 +53,18 @@ func From[T any](r io.Reader) (*Config[T], error) {
 		return nil, err
 	}
 
-	return &c, yaml.NewDecoder(&b).Decode(&c.content)
+	if decodeErr := yaml.NewDecoder(&b).Decode(&c.content); decodeErr != nil {
+		return nil, decodeErr
+	}
+
+	switch v := any(&c.content).(type) {
+	case Validator:
+		if err := v.Validate(); err != nil {
+			return nil, err
+		}
+	}
+
+	return &c, nil
 }
 
 // To writes a configuration to the given io.Writer.
