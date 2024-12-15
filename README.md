@@ -65,8 +65,8 @@
 templig
 =======
 
-*templig* is configuration library utilizing the text templating engine and the functions best known from helm charts,
-that originally stem from [Masterminds/sprig](http://github.com/Masterminds/sprig).
+*templig* (pronounced [ˈtɛmplɪç]) is configuration library utilizing the text templating engine and the functions best
+known from helm charts, that originally stem from [Masterminds/sprig](http://github.com/Masterminds/sprig).
 Its primary goal is to enable access to the system environment to fill information using the `env` function. It also
 enables to include verifications inside the configuration.
 
