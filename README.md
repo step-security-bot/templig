@@ -1,4 +1,4 @@
-<p align="center">
+<p style="text-align: center;">
     <img src="templig_logo.svg" width="25%" alt="Logo"><br>
     <a href="https://github.com/AlphaOne1/templig/actions/workflows/test.yml"
        rel="external"
@@ -54,7 +54,7 @@
         <img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FAlphaOne1%2Ftemplig.svg?type=shield&issueType=security"
              alt="FOSSA Status">
     </a>
-    <a href="http://godoc.org/github.com/AlphaOne1/templig"
+    <a href="https://godoc.org/github.com/AlphaOne1/templig"
        rel="external"
        target="_blank">
         <img src="https://godoc.org/github.com/AlphaOne1/templig?status.svg"
@@ -66,7 +66,7 @@ templig
 =======
 
 *templig* (pronounced [ˈtɛmplɪç]) is configuration library utilizing the text templating engine and the functions best
-known from helm charts, that originally stem from [Masterminds/sprig](http://github.com/Masterminds/sprig).
+known from helm charts, that originally stem from [Masterminds/sprig](https://github.com/Masterminds/sprig).
 Its primary goal is to enable access to the system environment to fill information using the `env` function. It also
 enables to include verifications inside the configuration.
 

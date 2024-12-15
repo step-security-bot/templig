@@ -63,8 +63,8 @@ All the good intentions go to waste, if nobody can enjoy the fruits of this labo
 due to non-existent (or bad, or wrong) documentation. Please take care that you
 include:
 
-- a corse description of your nea feature
-- generate new or update (in case) the existing examnples
+- a course description of your nea feature
+- generate new or update (in case) the existing examples
 - update the CHANGELOG.md
 
 The CHANGELOG document contains the changes of the next major contains all the
@@ -77,8 +77,8 @@ control system.
 At this point, if your changes look good and tests are passing, you are ready to
 create a pull request.
 
-Github Actions will run the test suite against the latest Go version. There are
-tests that most likey did not run in the developers machine (CodeQL, Trivy). These
+GitHub Actions will run the test suite against the latest Go version. There are
+tests that most likely did not run in the developers machine (CodeQL, Trivy). These
 tests may produce warnings. Take those warnings serious even if they seem harmless.
 Too many harmless warnings could possibly overlay really serious ones, so all
 warnings are to be resolved.

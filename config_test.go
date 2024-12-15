@@ -68,7 +68,7 @@ func TestReadConfig(t *testing.T) {
                 id:   23
                 name: Name0
                 conn:
-                  url: http://www.tests.to
+                  url: https://www.tests.to
                   passes:
                     - password0
                     - password1`,
@@ -76,7 +76,7 @@ func TestReadConfig(t *testing.T) {
 				ID:   23,
 				Name: "Name0",
 				Conn: &TestConn{
-					URL: "http://www.tests.to",
+					URL: "https://www.tests.to",
 					Passes: []string{
 						"password0",
 						"password1",
@@ -90,7 +90,7 @@ func TestReadConfig(t *testing.T) {
                 id:   23
                 name: {{ required "has to be set" "Name0" | quote }}
                 conn:
-                  url: http://www.tests.to
+                  url: https://www.tests.to
                   passes:
                     - password0
                     - password1`,
@@ -98,7 +98,7 @@ func TestReadConfig(t *testing.T) {
 				ID:   23,
 				Name: "Name0",
 				Conn: &TestConn{
-					URL: "http://www.tests.to",
+					URL: "https://www.tests.to",
 					Passes: []string{
 						"password0",
 						"password1",
@@ -153,7 +153,7 @@ func TestReadConfig(t *testing.T) {
 				ID:   9,
 				Name: "Name0",
 				Conn: &TestConn{
-					URL: "http://www.tests.to",
+					URL: "https://www.tests.to",
 					Passes: []string{
 						"pass0",
 						"pass1",
@@ -171,7 +171,7 @@ func TestReadConfig(t *testing.T) {
 				ID:   9,
 				Name: "Name1",
 				Conn: &TestConn{
-					URL: "http://www.tests.to",
+					URL: "https://www.tests.to",
 					Passes: []string{
 						"pass0",
 						"pass1",
@@ -186,7 +186,7 @@ func TestReadConfig(t *testing.T) {
 				ID:   9,
 				Name: "Name1",
 				Conn: &TestConn{
-					URL: "http://www.tests.to",
+					URL: "https://www.tests.to",
 					Passes: []string{
 						"pass0",
 						"cannot_work",

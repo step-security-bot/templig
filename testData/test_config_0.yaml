@@ -4,7 +4,7 @@
 id: 9
 name: Name0
 conn:
-    url: http://www.tests.to
+    url: https://www.tests.to
     passes:
       - pass0
       - pass1
