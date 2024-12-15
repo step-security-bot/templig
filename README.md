@@ -1,4 +1,4 @@
-<p style="text-align: center;">
+<p align="center">
     <img src="templig_logo.svg" width="25%" alt="Logo"><br>
     <a href="https://github.com/AlphaOne1/templig/actions/workflows/test.yml"
        rel="external"
