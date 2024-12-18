@@ -42,7 +42,7 @@ func From[T any](r io.Reader) (*Config[T], error) {
 
 	if t, err = template.
 		New("config").
-		Funcs(templigFuncs()).
+		Funcs(templigFunctions()).
 		Parse(string(fileContent)); err != nil {
 		return nil, err
 	}
@@ -72,9 +72,20 @@ func (c *Config[T]) To(w io.Writer) error {
 	return yaml.NewEncoder(w).Encode(&c.content)
 }
 
-// ToSecretsHidden writes the configuration to the given io.Writer and hides secret values using the SecretRE.
+// ToSecretsHidden writes the configuration to the given io.Writer and hides secret values using the [SecretRE].
 // Strings are replaced with the number of * corresponding to their length.
-// Substructures (e.g. `"secrets": [ "a", "b", "c"]`) containing secrets, are replaced with a single *.
+// Substructures containing secrets, are replaced with a single '*'.
+// The following example
+//
+//	id: id0
+//	secrets:
+//	  - secret0
+//	  - secret1
+//
+// thus will be replaced by
+//
+//	id: id0
+//	secrets: *
 func (c *Config[T]) ToSecretsHidden(w io.Writer) error {
 	tmpMap := make(map[string]any)
 	data := bytes.Buffer{}

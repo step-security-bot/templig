@@ -78,7 +78,7 @@ jobs:
                     echo "hasResults=false" >> $GITHUB_OUTPUT
                 fi
 
-          - name: Upload govolncheck results to GitHub Security tab
+          - name: Upload govulncheck results to GitHub Security tab
             if: ${{ steps.PrintSarif.outputs.hasResults == 'true' }}
             uses: github/codeql-action/upload-sarif@df409f7d9260372bd5f19e5b04e83cb3c43714ae # v3.27.9
             with:

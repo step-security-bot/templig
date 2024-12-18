@@ -12,8 +12,8 @@ import (
 	"github.com/Masterminds/sprig/v3"
 )
 
-// templigFuncs gives all the functions that are enabled for the templating engine.
-func templigFuncs() template.FuncMap {
+// templigFunctions gives all the functions that are enabled for the templating engine.
+func templigFunctions() template.FuncMap {
 	result := sprig.TxtFuncMap()
 	result["required"] = required
 	result["read"] = readFile
@@ -29,11 +29,14 @@ func required(warn string, val any) (any, error) {
 	return val, nil
 }
 
+// readFile is a template function to read a file and store its content into a string.
+// If the file does not exist, an empty string is generated, facilitating the use of `required` for customized
+// user interaction.
 func readFile(fileName string) (any, error) {
 	file, err := os.Open(fileName)
 
 	if err != nil {
-		return "", err
+		return "", nil
 	}
 
 	defer func() { _ = file.Close() }()

@@ -290,7 +290,7 @@ func TestBrokenReader(t *testing.T) {
 	}
 }
 
-func TestNonexistingFile(t *testing.T) {
+func TestNonexistentFile(t *testing.T) {
 	c, fromErr := FromFile[TestConfig]("testData/test_does_not_exist.yaml")
 
 	if fromErr == nil {
@@ -338,11 +338,11 @@ func TestWriteFile(t *testing.T) {
 func TestWriteProtectedFile(t *testing.T) {
 	c, _ := FromFile[TestConfig]("testData/test_config_0.yaml")
 
-	if chmodErr := os.Chmod("testData/test_writeprotected.yaml", 0400); chmodErr != nil {
+	if chmodErr := os.Chmod("testData/test_write_protected.yaml", 0400); chmodErr != nil {
 		t.Errorf("could not writeprotect file for test: %v", chmodErr)
 	}
 
-	err := c.ToFile("testData/test_writeprotected.yaml")
+	err := c.ToFile("testData/test_write_protected.yaml")
 
 	if err == nil {
 		t.Errorf("writing to file should not work")

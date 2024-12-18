@@ -33,7 +33,7 @@ func hideSecretsStringMap(m map[string]any) {
 }
 
 // hideSecretsAnyMap hides secrets inside a non-string keyed map. That means, that secrets can
-// only be inside the substructure, or they would be hidden by the hideSecretsStringMap function.
+// only be inside the substructure, or they would be hidden by the [hideSecretsStringMap] function.
 func hideSecretsAnyMap(m map[any]any) {
 	for _, v := range m {
 		hideSecrets(v)
@@ -53,7 +53,7 @@ func hideSecrets(a any) {
 	}
 }
 
-// hideSecretsSlice hides secrets inside the given slice. It applies the hideSecrets function on each value.
+// hideSecretsSlice hides secrets inside the given slice. It applies the [hideSecrets] function on each value.
 func hideSecretsSlice(s []any) {
 	for _, v := range s {
 		hideSecrets(v)
