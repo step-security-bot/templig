@@ -2,7 +2,10 @@ Release 0.3.0
 =============
 
 - update dependencies
-- added node based yaml merge to prevent deserialization inaccuracies
+- added node-based YAML merge function `MergeYAMLNodes` to prevent 
+  deserialization inaccuracies
+- added `FromFiles` to facilitate reading from multiple input files
+  that overlay each other in order
 
 Release 0.2.0
 =============
