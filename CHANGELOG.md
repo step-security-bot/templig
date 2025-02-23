@@ -1,3 +1,9 @@
+Release 0.3.0
+=============
+
+- update dependencies
+- added node based yaml merge to prevent deserialization inaccuracies
+
 Release 0.2.0
 =============
 
