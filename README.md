@@ -113,6 +113,55 @@ func main() {
 The `Get` method gives a pointer to the internally held Config structure that the use supplied. The pinter is always
 non-nil, so additional nil-checks are not necessary.
 
+### Reading with Overlays
+
+Having a base configuration file `my_config.yaml` like the following:
+
+```yaml
+id:   23
+name: Interesting DevName
+```
+
+Further a file that contains specific configuration for e.g. the production environment `my_prod_overlay.yaml`:
+
+```yaml
+name: Important ProdName
+```
+
+The code to read those files would look like this:
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/AlphaOne1/templig"
+)
+
+type Config struct {
+	ID   int    `yaml:"id"`
+	Name string `yaml:"name"`
+}
+
+func main() {
+	c, confErr := templig.FromFiles[Config]([]string{
+        "my_config.yaml",
+        "my_prod_overlay.yaml",
+    })
+
+	fmt.Printf("read errors: %v", confErr)
+
+	if confErr == nil {
+		fmt.Printf("ID:   %v\n", c.Get().ID)
+		fmt.Printf("Name: %v\n", c.Get().Name)
+	}
+}
+```
+
+That way, the different configuration files are read in order, witht he first one as the base. Every additional file
+gives changes to all the ones read before. In this example, changing the name.
+
 ### Reading environment
 
 Having a templated configuration file like this one:
