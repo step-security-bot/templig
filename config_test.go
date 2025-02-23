@@ -219,7 +219,7 @@ func TestReadConfig(t *testing.T) {
 		if len(test.in) > 0 {
 			c, fromErr = From[TestConfig](&testBuf)
 		} else if len(test.inFile) > 0 {
-			c, fromErr = FromFile[TestConfig](test.inFile)
+			c, fromErr = FromFiles[TestConfig]([]string{test.inFile})
 		} else {
 			t.Errorf("%v: neither input data nor input file given", k)
 		}
@@ -268,6 +268,47 @@ func TestReadConfig(t *testing.T) {
 	}
 }
 
+func TestReadOverlayConfig(t *testing.T) {
+	config, configErr := FromFiles[TestConfig]([]string{
+		"testData/test_config_0.yaml",
+		"testData/test_config_0_overlay.yaml",
+	})
+
+	if configErr != nil {
+		t.Errorf("no error expected reading multiple files: %v", configErr)
+	}
+
+	if len(config.Get().Conn.Passes) != 3 {
+		t.Errorf("expected the passes to contain 3 entries")
+	}
+
+	if config.Get().Conn.Passes[2] != "pass2" {
+		t.Errorf("expected the passes to be pass2 on index 2, but got %v", config.Get().Conn.Passes[2])
+	}
+}
+
+func TestReadOverlayConfigMismatch(t *testing.T) {
+	_, configErr := FromFiles[TestConfig]([]string{
+		"testData/test_config_0.yaml",
+		"testData/test_config_0_overlay_mismatch.yaml",
+	})
+
+	if configErr == nil {
+		t.Errorf(" error expected reading multiple incompatible files:")
+	}
+}
+
+func TestReadOverlayConfigWrongType(t *testing.T) {
+	_, configErr := FromFiles[TestConfig]([]string{
+		"testData/test_config_0.yaml",
+		"testData/test_config_0_overlay_wrongtype.yaml",
+	})
+
+	if configErr == nil {
+		t.Errorf(" error expected reading multiple incompatible files:")
+	}
+}
+
 type BrokenIO struct{}
 
 func (b *BrokenIO) Read(_ []byte) (n int, err error) {
@@ -292,6 +333,33 @@ func TestBrokenReader(t *testing.T) {
 
 func TestNonexistentFile(t *testing.T) {
 	c, fromErr := FromFile[TestConfig]("testData/test_does_not_exist.yaml")
+
+	if fromErr == nil {
+		t.Errorf("reading from broken reader should have returned an error")
+	}
+
+	if c != nil {
+		t.Errorf("reading from broken reader should have returned nil")
+	}
+}
+
+func TestNonexistentFileOverlayAddon(t *testing.T) {
+	c, fromErr := FromFiles[TestConfig]([]string{
+		"testData/test_config_0.yaml",
+		"testData/test_does_not_exist.yaml",
+	})
+
+	if fromErr == nil {
+		t.Errorf("reading from broken reader should have returned an error")
+	}
+
+	if c != nil {
+		t.Errorf("reading from broken reader should have returned nil")
+	}
+}
+
+func TestNoFiles(t *testing.T) {
+	c, fromErr := FromFiles[TestConfig]([]string{})
 
 	if fromErr == nil {
 		t.Errorf("reading from broken reader should have returned an error")

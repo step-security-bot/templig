@@ -6,6 +6,7 @@ package templig
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"text/template"
@@ -109,6 +110,42 @@ func FromFile[T any](path string) (*Config[T], error) {
 	defer func() { _ = f.Close() }()
 
 	return From[T](f)
+}
+
+func FromFiles[T any](paths []string) (*Config[T], error) {
+	if len(paths) == 0 {
+		return nil, fmt.Errorf("no configuration paths given")
+	}
+
+	base, baseErr := FromFile[yaml.Node](paths[0])
+
+	if baseErr != nil {
+		return nil, baseErr
+	}
+
+	for _, addOn := range paths[1:] {
+		a, aErr := FromFile[yaml.Node](addOn)
+
+		if aErr != nil {
+			return nil, aErr
+		}
+
+		merged, mergeErr := MergeYAMLNodes(base.Get(), a.Get())
+
+		if mergeErr != nil {
+			return nil, mergeErr
+		}
+
+		base.content = *merged
+	}
+
+	var result Config[T]
+
+	if resultErr := base.Get().Decode(&result.content); resultErr != nil {
+		return nil, resultErr
+	}
+
+	return &result, nil
 }
 
 // ToFile saves a configuration to a file with the given name, replacing it in case.
