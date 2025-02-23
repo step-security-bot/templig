@@ -216,7 +216,7 @@ func TestStrangeDocumentNodes(t *testing.T) {
 	b := yaml.Node{
 		Kind: yaml.DocumentNode,
 		Content: []*yaml.Node{
-			&yaml.Node{
+			{
 				Kind: yaml.ScalarNode,
 			},
 		},
