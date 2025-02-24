@@ -7,6 +7,7 @@ Supported Versions
 | Version        | Supported          |
 |----------------|--------------------|
 | master         | :white_check_mark: |
+| releases 0.x   | :white_check_mark: |
 | other branches | :x:                |
 
 Reporting a Vulnerability
