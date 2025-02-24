@@ -12,16 +12,19 @@ import (
 
 func TestHideSecrets(t *testing.T) {
 	tests := []struct {
-		in   any
-		want any
+		in            any
+		want          any
+		hideStructure bool
 	}{
 		{ // 0
-			in:   "hello",
-			want: "hello",
+			in:            "hello",
+			want:          "hello",
+			hideStructure: true,
 		},
 		{ // 1
-			in:   []string{"a", "b", "c"},
-			want: []string{"a", "b", "c"},
+			in:            []string{"a", "b", "c"},
+			want:          []string{"a", "b", "c"},
+			hideStructure: true,
 		},
 		{ // 2
 			in: map[string]any{
@@ -30,10 +33,12 @@ func TestHideSecrets(t *testing.T) {
 			want: map[string]any{
 				"Hello": "World",
 			},
+			hideStructure: true,
 		},
 		{ // 3
-			in:   "secret",
-			want: "secret",
+			in:            "secret",
+			want:          "secret",
+			hideStructure: true,
 		},
 		{ // 4
 			in: map[string]any{
@@ -42,6 +47,7 @@ func TestHideSecrets(t *testing.T) {
 			want: map[string]any{
 				"secret": "*****",
 			},
+			hideStructure: true,
 		},
 		{ // 5
 			in: map[string]any{
@@ -60,6 +66,7 @@ func TestHideSecrets(t *testing.T) {
 					},
 				},
 			},
+			hideStructure: true,
 		},
 		{ // 6
 			in: map[any]any{
@@ -78,6 +85,7 @@ func TestHideSecrets(t *testing.T) {
 					},
 				},
 			},
+			hideStructure: true,
 		},
 		{ // 7
 			in: map[string]any{
@@ -89,6 +97,7 @@ func TestHideSecrets(t *testing.T) {
 			want: map[any]any{
 				"secrets": "*",
 			},
+			hideStructure: true,
 		},
 		{ // 8
 			in: map[string]any{
@@ -103,6 +112,22 @@ func TestHideSecrets(t *testing.T) {
 					"secrets": "*",
 				},
 			},
+			hideStructure: true,
+		},
+		{ // 9
+			in: map[string]any{
+				"connections": map[string]any{
+					"user":    "us",
+					"secrets": []string{"a", "bb", "ccc"},
+				},
+			},
+			want: map[string]any{
+				"connections": map[string]any{
+					"user":    "us",
+					"secrets": []string{"*", "**", "***"},
+				},
+			},
+			hideStructure: false,
 		},
 	}
 
@@ -110,9 +135,17 @@ func TestHideSecrets(t *testing.T) {
 	wantBuf := bytes.Buffer{}
 
 	for k, test := range tests {
-		hideSecrets(test.in)
+		node := yaml.Node{}
+		encodeErr := node.Encode(test.in)
 
-		if err := yaml.NewEncoder(&gotBuf).Encode(test.in); err != nil {
+		if encodeErr != nil {
+			t.Errorf("%v: could not encode value", k)
+			continue
+		}
+
+		HideSecrets(&node, test.hideStructure)
+
+		if err := yaml.NewEncoder(&gotBuf).Encode(&node); err != nil {
 			t.Errorf("%v: Got error serializing got", k)
 		}
 		if err := yaml.NewEncoder(&wantBuf).Encode(test.want); err != nil {
@@ -129,11 +162,37 @@ func TestHideSecrets(t *testing.T) {
 }
 
 func TestHideSecretsNil(t *testing.T) {
-	var a *int = nil
+	var a *yaml.Node = nil
 
-	hideSecrets(&a)
+	HideSecrets(a, true)
+}
 
-	if a != nil {
-		t.Errorf("secret hiding changed a nil pointer")
+func TestHideSecretAlias(t *testing.T) {
+	in := `
+open: &ref |-
+    value
+pass: *ref`
+	want := `open: &ref |-
+    *****
+pass: *ref
+`
+
+	node := &yaml.Node{}
+
+	if decodeErr := yaml.NewDecoder(bytes.NewBufferString(in)).Decode(node); decodeErr != nil {
+		t.Errorf("unexpted encode error: %v", decodeErr)
+		return
+	}
+
+	buf := bytes.Buffer{}
+
+	HideSecrets(node, true)
+
+	if encodeErr := yaml.NewEncoder(&buf).Encode(node); encodeErr != nil {
+		t.Errorf("could not encode node: %v", encodeErr)
+	}
+
+	if buf.String() != want {
+		t.Errorf("unexpected output:\n%v\nwanted:\n%v", buf.String(), want)
 	}
 }

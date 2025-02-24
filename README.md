@@ -65,10 +65,12 @@
 templig
 =======
 
-*templig* (pronounced [ˈtɛmplɪç]) is configuration library utilizing the text templating engine and the functions best
-known from helm charts, that originally stem from [Masterminds/sprig](https://github.com/Masterminds/sprig).
-Its primary goal is to enable access to the system environment to fill information using the `env` function. It also
-enables to include verifications inside the configuration.
+*templig* (pronounced [ˈtɛmplɪç]) is non-intrusive configuration library utilizing the text templating engine and the
+functions best known from helm charts, that originally stem from [Masterminds/sprig](https://github.com/Masterminds/sprig).
+Its primary goal is to enable dynamic configuration files, that have access to the system environment to fill
+information using the `env` function. To facilitate different environments, overlays can be defined, that amend a base
+configuration with environment specific attributes and changes.
+Configurations providing the methods for the `Validator` interface also have automated checking on load enabled.
 
 Usage
 -----
@@ -110,7 +112,7 @@ func main() {
 }
 ```
 
-The `Get` method gives a pointer to the internally held Config structure that the use supplied. The pinter is always
+The `Get` method gives a pointer to the internally held Config structure that the user supplied. The pointer is always
 non-nil, so additional nil-checks are not necessary.
 
 ### Reading with Overlays
@@ -122,7 +124,7 @@ id:   23
 name: Interesting DevName
 ```
 
-Further a file that contains specific configuration for e.g. the production environment `my_prod_overlay.yaml`:
+and a file that contains specific configuration for e.g. the production environment `my_prod_overlay.yaml`:
 
 ```yaml
 name: Important ProdName
@@ -159,7 +161,7 @@ func main() {
 }
 ```
 
-That way, the different configuration files are read in order, witht he first one as the base. Every additional file
+That way, the different configuration files are read in order, with he first one as the base. Every additional file
 gives changes to all the ones read before. In this example, changing the name.
 
 ### Reading environment
@@ -221,10 +223,10 @@ func main() {
 ### Validation
 
 The templating facilities allow also for a wide range of tests, but depend on the configuration file read. As it is most
-like user supplied, possible consistency checks are not reliable in the form of template code.
+likely user supplied, possible consistency checks are not reliable in the form of template code.
 For this purpose, *templig* also allows for the configuration structure to implement the `Validator` interface.
 Implementing types provide a function `Validate` that allows *templig* to check __after__ the configuration was read, if
-its structure could be considered valid and report errors accordingly.
+its structure should be considered valid and report errors accordingly.
 
 ```go
 package main
@@ -269,11 +271,10 @@ func main() {
 
 Validation functionality can be as simple as in this example. But as the complexity of the configuration grows,
 automated tools to generate the configuration structure and basic consistency checks could be employed. These use
-JSON Schema or its embedded form in OpenAPI 2 or 3.
+e.g. JSON Schema or its embedded form in OpenAPI 2 or 3.
 
 A non-exhaustive list of these:
 
 * https://github.com/omissis/go-jsonschema (JSON Schema)
 * https://github.com/ogen-go/ogen (OpenAPI 3.x)
 * https://github.com/go-swagger/go-swagger (OpenAPI 2.0 / Swagger 2.0)
- 

@@ -1,3 +1,10 @@
+Release 0.4.0
+=============
+
+- use parse structure of YAML documents for secrets hiding
+- documentation fixes
+- node based function `HideSecrets`, to hide secret in configurations
+
 Release 0.3.0
 =============
 

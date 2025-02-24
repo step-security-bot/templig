@@ -88,15 +88,48 @@ func (c *Config[T]) To(w io.Writer) error {
 //	id: id0
 //	secrets: *
 func (c *Config[T]) ToSecretsHidden(w io.Writer) error {
-	tmpMap := make(map[string]any)
-	data := bytes.Buffer{}
+	var writeErr error = nil
+	node := yaml.Node{}
 
-	err0 := yaml.NewEncoder(&data).Encode(&c.content)
-	err1 := yaml.NewDecoder(&data).Decode(tmpMap)
+	encodeErr := node.Decode(c.content)
 
-	hideSecrets(tmpMap)
+	if encodeErr == nil {
+		HideSecrets(&node, true)
+		writeErr = yaml.NewEncoder(w).Encode(node)
+	}
 
-	return errors.Join(err0, err1, yaml.NewEncoder(w).Encode(tmpMap))
+	return errors.Join(encodeErr, writeErr)
+}
+
+// ToSecretsHiddenStructured writes the configuration to the given io.Writer
+// and hides secret values using the [SecretRE].
+// Strings are replaced with the number of * corresponding to their length.
+// Substructures containing secrets, are replaced with a corresponding structure of '*'.
+// The following example
+//
+//	id: id0
+//	secrets:
+//	  - secret0
+//	  - secret1
+//
+// thus will be replaced by
+//
+//	id: id0
+//	secrets:
+//	  - *******
+//	  - *******
+func (c *Config[T]) ToSecretsHiddenStructured(w io.Writer) error {
+	var writeErr error = nil
+	node := yaml.Node{}
+
+	encodeErr := node.Decode(c.content)
+
+	if encodeErr == nil {
+		HideSecrets(&node, false)
+		writeErr = yaml.NewEncoder(w).Encode(node)
+	}
+
+	return errors.Join(encodeErr, writeErr)
 }
 
 // FromFile loads a configuration from a file with the given name.

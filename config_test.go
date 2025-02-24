@@ -431,6 +431,20 @@ func TestSecretsHidden(t *testing.T) {
 	}
 }
 
+func TestSecretsHiddenStructured(t *testing.T) {
+	c, _ := FromFile[TestConfig]("testData/test_config_0.yaml")
+
+	buf := bytes.Buffer{}
+
+	if err := c.ToSecretsHiddenStructured(&buf); err != nil {
+		t.Errorf("could not generate secrets-hidden config")
+	}
+
+	if strings.Contains(buf.String(), "pass0") || strings.Contains(buf.String(), "pass1") {
+		t.Errorf("found secrets in normally secrets-hidden output")
+	}
+}
+
 func FuzzFromFileEnv(f *testing.F) {
 	f.Add("")
 	f.Add("12345")
