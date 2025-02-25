@@ -145,6 +145,8 @@ func FromFile[T any](path string) (*Config[T], error) {
 	return From[T](f)
 }
 
+// FromFiles loads a series of configuration files. The first file is considered the base, all others are
+// loaded on top of that one using the [MergeYAMLNodes] functionality.
 func FromFiles[T any](paths []string) (*Config[T], error) {
 	if len(paths) == 0 {
 		return nil, fmt.Errorf("no configuration paths given")

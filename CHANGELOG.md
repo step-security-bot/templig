@@ -1,3 +1,8 @@
+Release 0.4.1
+=============
+
+- added documentation for `FromFiles`
+
 Release 0.4.0
 =============
 
