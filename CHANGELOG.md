@@ -1,3 +1,8 @@
+Release 0.5.0
+=============
+
+- added `arg` and `hasArg` template functions
+
 Release 0.4.1
 =============
 

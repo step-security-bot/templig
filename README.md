@@ -186,10 +186,12 @@ As demonstrated, one can use the templating functionality that is best known fro
 come from the aforementioned [sprig](http://github.com/Masterminds/sprig)-library. For convenience *templig* also
 provides further functionality:
 
-| Function | Description                                               |
-|----------|-----------------------------------------------------------|
-| required | checks that its second argument is not zero length or nil |
-| read     | reads the content of a file                               |
+| Function | Description                                                         |
+|----------|---------------------------------------------------------------------|
+| arg      | reads the value of the command line argument with the given name    |
+| hasArg   | true if an argument with the given name is present, false otherwise |
+| required | checks that its second argument is not zero length or nil           |
+| read     | reads the content of a file                                         |
 
 ```go
 package main
