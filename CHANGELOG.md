@@ -2,6 +2,8 @@ Release 0.5.0
 =============
 
 - added `arg` and `hasArg` template functions
+- documentation structure improved
+- restructured examples to specifically address templating functions
 
 Release 0.4.1
 =============
