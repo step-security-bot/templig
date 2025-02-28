@@ -187,12 +187,12 @@ As expected, the value of `Name` was replaced by the one provided in overlay con
 their use in [helm](https://github.com/helm/helm) charts. On top of that, the following functions are provided for
 convenience:
 
-| Function | Description                                                         | Example                              |
-|----------|---------------------------------------------------------------------|--------------------------------------|
-| arg      | reads the value of the command line argument with the given name    | [arg](examples/templating/arg)       |
-| hasArg   | true if an argument with the given name is present, false otherwise | [hasArg](examples/templating/hasArg) |
-| required | checks that its second argument is not zero length or nil           | [required](examples/templating/env)  |
-| read     | reads the content of a file                                         | [read](examples/templating/read)     |
+| Function | Description                                                         | Example                            |
+|----------|---------------------------------------------------------------------|------------------------------------|
+| arg      | reads the value of the command line argument with the given name    | [Link](examples/templating/arg)    |
+| hasArg   | true if an argument with the given name is present, false otherwise | [Link](examples/templating/hasArg) |
+| required | checks that its second argument is not zero length or nil           | [Link](examples/templating/env)    |
+| read     | reads the content of a file                                         | [Link](examples/templating/read)   |
 
 The expansion of the templated parts is done __before__ overlaying takes place. Any errors of templating will thus be
 displayed in their respective source locations.
