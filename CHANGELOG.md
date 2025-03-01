@@ -1,3 +1,10 @@
+Release 0.6.0
+=============
+
+- deprecated `FromFiles`, replaced by `FromFile`
+- multi-reader support for `From`
+- multi-file support for `FromFile`
+
 Release 0.5.0
 =============
 

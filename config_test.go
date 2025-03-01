@@ -290,7 +290,7 @@ func TestReadConfig(t *testing.T) {
 		if len(test.in) > 0 {
 			c, fromErr = From[TestConfig](&testBuf)
 		} else if len(test.inFile) > 0 {
-			c, fromErr = FromFiles[TestConfig]([]string{test.inFile})
+			c, fromErr = FromFile[TestConfig](test.inFile)
 		} else {
 			t.Errorf("%v: neither input data nor input file given", k)
 		}
@@ -343,11 +343,42 @@ func TestReadConfig(t *testing.T) {
 	}
 }
 
+func TestNoReaders(t *testing.T) {
+	c, fromErr := From[TestConfig]()
+
+	if fromErr == nil {
+		t.Errorf("reading from broken reader should have returned an error")
+	}
+
+	if c != nil {
+		t.Errorf("reading from broken reader should have returned nil")
+	}
+}
+
 func TestReadOverlayConfig(t *testing.T) {
-	config, configErr := FromFiles[TestConfig]([]string{
+	config, configErr := FromFile[TestConfig](
 		"testData/test_config_0.yaml",
 		"testData/test_config_0_overlay.yaml",
-	})
+	)
+
+	if configErr != nil {
+		t.Errorf("no error expected reading multiple files: %v", configErr)
+	}
+
+	if len(config.Get().Conn.Passes) != 3 {
+		t.Errorf("expected the passes to contain 3 entries")
+	}
+
+	if config.Get().Conn.Passes[2] != "pass2" {
+		t.Errorf("expected the passes to be pass2 on index 2, but got %v", config.Get().Conn.Passes[2])
+	}
+}
+
+func TestReadOverlayConfigReader(t *testing.T) {
+	f0, _ := os.Open("testData/test_config_0.yaml")
+	f1, _ := os.Open("testData/test_config_0_overlay.yaml")
+
+	config, configErr := From[TestConfig](f0, f1)
 
 	if configErr != nil {
 		t.Errorf("no error expected reading multiple files: %v", configErr)
@@ -363,10 +394,10 @@ func TestReadOverlayConfig(t *testing.T) {
 }
 
 func TestReadOverlayConfigMismatch(t *testing.T) {
-	_, configErr := FromFiles[TestConfig]([]string{
+	_, configErr := FromFile[TestConfig](
 		"testData/test_config_0.yaml",
 		"testData/test_config_0_overlay_mismatch.yaml",
-	})
+	)
 
 	if configErr == nil {
 		t.Errorf(" error expected reading multiple incompatible files:")
@@ -374,10 +405,10 @@ func TestReadOverlayConfigMismatch(t *testing.T) {
 }
 
 func TestReadOverlayConfigWrongType(t *testing.T) {
-	_, configErr := FromFiles[TestConfig]([]string{
+	_, configErr := FromFile[TestConfig](
 		"testData/test_config_0.yaml",
 		"testData/test_config_0_overlay_wrongtype.yaml",
-	})
+	)
 
 	if configErr == nil {
 		t.Errorf(" error expected reading multiple incompatible files:")
@@ -406,6 +437,21 @@ func TestBrokenReader(t *testing.T) {
 	}
 }
 
+func TestReadOverlayConfigBrokenReader(t *testing.T) {
+	f0 := &BrokenIO{}
+	f1 := &BrokenIO{}
+
+	c, fromErr := From[TestConfig](f0, f1)
+
+	if fromErr == nil {
+		t.Errorf("reading from broken reader should have returned an error")
+	}
+
+	if c != nil {
+		t.Errorf("reading from broken reader should have returned nil")
+	}
+}
+
 func TestNonexistentFile(t *testing.T) {
 	c, fromErr := FromFile[TestConfig]("testData/test_does_not_exist.yaml")
 
@@ -419,10 +465,10 @@ func TestNonexistentFile(t *testing.T) {
 }
 
 func TestNonexistentFileOverlayAddon(t *testing.T) {
-	c, fromErr := FromFiles[TestConfig]([]string{
+	c, fromErr := FromFile[TestConfig](
 		"testData/test_config_0.yaml",
 		"testData/test_does_not_exist.yaml",
-	})
+	)
 
 	if fromErr == nil {
 		t.Errorf("reading from broken reader should have returned an error")

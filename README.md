@@ -154,10 +154,10 @@ type Config struct {
 }
 
 func main() {
-	c, confErr := templig.FromFiles[Config]([]string{
+	c, confErr := templig.FromFile[Config](
 		"my_config.yaml",
 		"my_prod_overlay.yaml",
-	})
+	)
 
 	fmt.Printf("read errors: %v", confErr)
 
