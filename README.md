@@ -65,11 +65,12 @@
 templig
 =======
 
-*templig* (pronounced [ˈtɛmplɪç]) is non-intrusive configuration library utilizing the text templating engine and the
-functions best known from helm charts, that originally stem from [Masterminds/sprig](https://github.com/Masterminds/sprig).
+*templig* (pronounced [ˈtɛmplɪç]) is a non-intrusive configuration library utilizing the text templating engine and the
+functions best known from [helm](https://github.com/helm/helm) charts, that originally stem from
+[Masterminds/sprig](https://github.com/Masterminds/sprig).
 Its primary goal is to enable dynamic configuration files, that have access to the system environment to fill
-information using the `env` function. To facilitate different environments, overlays can be defined, that amend a base
-configuration with environment specific attributes and changes.
+information using function like `env` and and `read`. To facilitate different environments, overlays can be defined,
+that amend a base configuration with environment specific attributes and changes.
 Configurations providing the methods for the `Validator` interface also have automated checking on load enabled.
 
 Usage
@@ -113,7 +114,13 @@ func main() {
 ```
 
 The `Get` method gives a pointer to the internally held Config structure that the user supplied. The pointer is always
-non-nil, so additional nil-checks are not necessary.
+non-nil, so additional nil-checks are not necessary. Running that program would give:
+
+```text
+read errors: <nil>
+ID:   23
+Name: Interesting Name
+```
 
 ### Reading with Overlays
 
@@ -162,9 +169,35 @@ func main() {
 ```
 
 That way, the different configuration files are read in order, with he first one as the base. Every additional file
-gives changes to all the ones read before. In this example, changing the name.
+gives changes to all the ones read before. In this example, changing the name. Running this program would give:
 
-### Reading environment
+```text
+read errors: <nil>
+ID:   23
+Name: Important ProdName
+```
+
+As expected, the value of `Name` was replaced by the one provided in overlay configuration.
+
+### Template functionality
+#### Overview
+
+*templig* supports templating the configuration files. On top of the few templating functions provided by the Go
+`text/template` library, the functions of [sprig](http://github.com/Masterminds/sprig), that are maybe best known for
+their use in [helm](https://github.com/helm/helm) charts. On top of that, the following functions are provided for
+convenience:
+
+| Function | Description                                                         | Example                            |
+|----------|---------------------------------------------------------------------|------------------------------------|
+| arg      | reads the value of the command line argument with the given name    | [Link](examples/templating/arg)    |
+| hasArg   | true if an argument with the given name is present, false otherwise | [Link](examples/templating/hasArg) |
+| required | checks that its second argument is not zero length or nil           | [Link](examples/templating/env)    |
+| read     | reads the content of a file                                         | [Link](examples/templating/read)   |
+
+The expansion of the templated parts is done __before__ overlaying takes place. Any errors of templating will thus be
+displayed in their respective source locations.
+
+#### Reading environment
 
 Having a templated configuration file like this one:
 
@@ -182,14 +215,9 @@ name: Interesting Name
 pass: {{ read "pass.txt" | required "password required" | quote }}
 ```
 
-As demonstrated, one can use the templating functionality that is best known from helm charts. The functions provided
-come from the aforementioned [sprig](http://github.com/Masterminds/sprig)-library. For convenience *templig* also
-provides further functionality:
-
-| Function | Description                                               |
-|----------|-----------------------------------------------------------|
-| required | checks that its second argument is not zero length or nil |
-| read     | reads the content of a file                               |
+One can see the templating code between the double curly braces `{{` and `}}`. 
+The following programm is essentially the same as in the [Simple Case](#simple-case).
+It just adds the `pass` field to the configuration: 
 
 ```go
 package main
@@ -222,8 +250,8 @@ func main() {
 
 ### Validation
 
-The templating facilities allow also for a wide range of tests, but depend on the configuration file read. As it is most
-likely user supplied, possible consistency checks are not reliable in the form of template code.
+The templating facilities allow also for a wide range of tests, but depend on the configuration file read. As it is
+most likely user supplied, possible consistency checks are not reliable in the form of template code.
 For this purpose, *templig* also allows for the configuration structure to implement the `Validator` interface.
 Implementing types provide a function `Validate` that allows *templig* to check __after__ the configuration was read, if
 its structure should be considered valid and report errors accordingly.

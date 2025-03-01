@@ -29,6 +29,7 @@ func TestReadConfig(t *testing.T) {
 		in      string
 		inFile  string
 		env     map[string]string
+		args    []string
 		want    TestConfig
 		wantErr bool
 	}{
@@ -195,6 +196,72 @@ func TestReadConfig(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{ // 13
+			in: `
+                id:   23
+                name: {{ arg "param0" | quote }}`,
+			want: TestConfig{
+				ID:   23,
+				Name: "paramVal0",
+			},
+			args:    []string{"-param0", "paramVal0"},
+			wantErr: false,
+		},
+		{ // 14
+			in: `
+                id:   23
+                name: {{ arg "param0" | quote }}`,
+			want: TestConfig{
+				ID:   23,
+				Name: "paramVal0",
+			},
+			args:    []string{"--param0", "paramVal0"},
+			wantErr: false,
+		},
+		{ // 15
+			in: `
+                id:   23
+                name: {{ arg "param0" | quote }}`,
+			want: TestConfig{
+				ID:   23,
+				Name: "paramVal0",
+			},
+			args:    []string{"--param0=paramVal0"},
+			wantErr: false,
+		},
+		{ // 16
+			in: `
+                id:   23
+                name: {{ arg "param0" | required "param0 required" | quote }}`,
+			want: TestConfig{
+				ID:   23,
+				Name: "true",
+			},
+			args:    []string{"--param0"},
+			wantErr: true,
+		},
+		{ // 17
+			in: `
+                id:   23
+                name: {{ if hasArg "param0" }} "have" {{ else }} "have not" {{ end }}`,
+			want: TestConfig{
+				ID:   23,
+				Name: "have",
+			},
+			args:    []string{"--param0"},
+			wantErr: false,
+		},
+		{ // 18
+			in: `
+                id:   23
+                name: {{ if hasArg "param1" }} "have" {{ else }} "have not" {{ end }}`,
+			want: TestConfig{
+				ID:   23,
+				Name: "have not",
+			},
+			args:    []string{"--param0"},
+			wantErr: false,
+		},
 	}
 
 	testBuf := bytes.Buffer{}
@@ -211,6 +278,10 @@ func TestReadConfig(t *testing.T) {
 			for ei, ev := range test.env {
 				_ = os.Setenv(ei, ev)
 			}
+		}
+
+		if test.args != nil {
+			os.Args = append(os.Args, test.args...)
 		}
 
 		var c *Config[TestConfig]
@@ -264,6 +335,10 @@ func TestReadConfig(t *testing.T) {
 			for ei := range test.env {
 				_ = os.Unsetenv(ei)
 			}
+		}
+
+		if len(test.args) > 0 {
+			os.Args = os.Args[:len(os.Args)-len(test.args)]
 		}
 	}
 }
