@@ -343,11 +343,42 @@ func TestReadConfig(t *testing.T) {
 	}
 }
 
+func TestNoReaders(t *testing.T) {
+	c, fromErr := From[TestConfig]()
+
+	if fromErr == nil {
+		t.Errorf("reading from broken reader should have returned an error")
+	}
+
+	if c != nil {
+		t.Errorf("reading from broken reader should have returned nil")
+	}
+}
+
 func TestReadOverlayConfig(t *testing.T) {
 	config, configErr := FromFiles[TestConfig]([]string{
 		"testData/test_config_0.yaml",
 		"testData/test_config_0_overlay.yaml",
 	})
+
+	if configErr != nil {
+		t.Errorf("no error expected reading multiple files: %v", configErr)
+	}
+
+	if len(config.Get().Conn.Passes) != 3 {
+		t.Errorf("expected the passes to contain 3 entries")
+	}
+
+	if config.Get().Conn.Passes[2] != "pass2" {
+		t.Errorf("expected the passes to be pass2 on index 2, but got %v", config.Get().Conn.Passes[2])
+	}
+}
+
+func TestReadOverlayConfigReader(t *testing.T) {
+	f0, _ := os.Open("testData/test_config_0.yaml")
+	f1, _ := os.Open("testData/test_config_0_overlay.yaml")
+
+	config, configErr := From[TestConfig](f0, f1)
 
 	if configErr != nil {
 		t.Errorf("no error expected reading multiple files: %v", configErr)
@@ -396,6 +427,21 @@ func (b *BrokenIO) Write(_ []byte) (n int, err error) {
 
 func TestBrokenReader(t *testing.T) {
 	c, fromErr := From[TestConfig](&BrokenIO{})
+
+	if fromErr == nil {
+		t.Errorf("reading from broken reader should have returned an error")
+	}
+
+	if c != nil {
+		t.Errorf("reading from broken reader should have returned nil")
+	}
+}
+
+func TestReadOverlayConfigBrokenReader(t *testing.T) {
+	f0 := &BrokenIO{}
+	f1 := &BrokenIO{}
+
+	c, fromErr := From[TestConfig](f0, f1)
 
 	if fromErr == nil {
 		t.Errorf("reading from broken reader should have returned an error")
