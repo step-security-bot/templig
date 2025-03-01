@@ -480,7 +480,7 @@ func TestNonexistentFileOverlayAddon(t *testing.T) {
 }
 
 func TestNoFiles(t *testing.T) {
-	c, fromErr := FromFile[TestConfig]()
+	c, fromErr := FromFiles[TestConfig]([]string{})
 
 	if fromErr == nil {
 		t.Errorf("reading from broken reader should have returned an error")
