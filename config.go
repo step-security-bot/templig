@@ -55,8 +55,7 @@ func (c *Config[T]) overlay(r io.Reader) error {
 	return nil
 }
 
-// overlayFile opens a given configuration file and loads it as an intermediate overlay on top of the
-// existing intermediate configuration.
+// overlayFile opens a given configuration file and loads it as an intermediate using the overlay function.
 func (c *Config[T]) overlayFile(path string) error {
 	f, err := os.Open(path)
 
@@ -69,7 +68,8 @@ func (c *Config[T]) overlayFile(path string) error {
 	return c.overlay(f)
 }
 
-// fromSingle reads a configuration from the single given io.Reader and runs the maybe contained template functions.
+// fromSingle reads a configuration from the single given io.Reader and
+// runs - if necessary - the contained template functions.
 func fromSingle[T any](r io.Reader) (*Config[T], error) {
 	var c Config[T]
 	fileContent, err := io.ReadAll(r)
