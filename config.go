@@ -265,6 +265,8 @@ func FromFile[T any](paths ...string) (*Config[T], error) {
 
 // FromFiles loads a series of configuration files. The first file is considered the base, all others are
 // loaded on top of that one using the [MergeYAMLNodes] functionality.
+//
+// Deprecated: As of version 0.6.0 this function is deprecated and will be removed in the next major release.
 func FromFiles[T any](paths []string) (*Config[T], error) {
 	return FromFile[T](paths...)
 }

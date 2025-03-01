@@ -290,7 +290,7 @@ func TestReadConfig(t *testing.T) {
 		if len(test.in) > 0 {
 			c, fromErr = From[TestConfig](&testBuf)
 		} else if len(test.inFile) > 0 {
-			c, fromErr = FromFiles[TestConfig]([]string{test.inFile})
+			c, fromErr = FromFile[TestConfig](test.inFile)
 		} else {
 			t.Errorf("%v: neither input data nor input file given", k)
 		}
@@ -356,10 +356,10 @@ func TestNoReaders(t *testing.T) {
 }
 
 func TestReadOverlayConfig(t *testing.T) {
-	config, configErr := FromFiles[TestConfig]([]string{
+	config, configErr := FromFile[TestConfig](
 		"testData/test_config_0.yaml",
 		"testData/test_config_0_overlay.yaml",
-	})
+	)
 
 	if configErr != nil {
 		t.Errorf("no error expected reading multiple files: %v", configErr)
@@ -394,10 +394,10 @@ func TestReadOverlayConfigReader(t *testing.T) {
 }
 
 func TestReadOverlayConfigMismatch(t *testing.T) {
-	_, configErr := FromFiles[TestConfig]([]string{
+	_, configErr := FromFile[TestConfig](
 		"testData/test_config_0.yaml",
 		"testData/test_config_0_overlay_mismatch.yaml",
-	})
+	)
 
 	if configErr == nil {
 		t.Errorf(" error expected reading multiple incompatible files:")
@@ -405,10 +405,10 @@ func TestReadOverlayConfigMismatch(t *testing.T) {
 }
 
 func TestReadOverlayConfigWrongType(t *testing.T) {
-	_, configErr := FromFiles[TestConfig]([]string{
+	_, configErr := FromFile[TestConfig](
 		"testData/test_config_0.yaml",
 		"testData/test_config_0_overlay_wrongtype.yaml",
-	})
+	)
 
 	if configErr == nil {
 		t.Errorf(" error expected reading multiple incompatible files:")
@@ -465,10 +465,10 @@ func TestNonexistentFile(t *testing.T) {
 }
 
 func TestNonexistentFileOverlayAddon(t *testing.T) {
-	c, fromErr := FromFiles[TestConfig]([]string{
+	c, fromErr := FromFile[TestConfig](
 		"testData/test_config_0.yaml",
 		"testData/test_does_not_exist.yaml",
-	})
+	)
 
 	if fromErr == nil {
 		t.Errorf("reading from broken reader should have returned an error")
@@ -480,7 +480,7 @@ func TestNonexistentFileOverlayAddon(t *testing.T) {
 }
 
 func TestNoFiles(t *testing.T) {
-	c, fromErr := FromFiles[TestConfig]([]string{})
+	c, fromErr := FromFile[TestConfig]()
 
 	if fromErr == nil {
 		t.Errorf("reading from broken reader should have returned an error")
