@@ -65,11 +65,11 @@
 templig
 =======
 
-*templig* (pronounced [ˈtɛmplɪç]) is a non-intrusive configuration library utilizing the text templating engine and the
-functions best known from [helm](https://github.com/helm/helm) charts, that originally stem from
+*templig* (pronounced [ˈtɛmplɪç]) is a non-intrusive configuration library that utilizes the text templating engine and
+the functions best known from [helm](https://github.com/helm/helm) charts, originating from
 [Masterminds/sprig](https://github.com/Masterminds/sprig).
 Its primary goal is to enable dynamic configuration files, that have access to the system environment to fill
-information using function like `env` and and `read`. To facilitate different environments, overlays can be defined,
+information using function like `env` and `read`. To facilitate different environments, overlays can be defined,
 that amend a base configuration with environment specific attributes and changes.
 Configurations providing the methods for the `Validator` interface also have automated checking on load enabled.
 
@@ -96,11 +96,13 @@ import (
 	"github.com/AlphaOne1/templig"
 )
 
+// Config is the configuration structure
 type Config struct {
 	ID   int    `yaml:"id"`
 	Name string `yaml:"name"`
 }
 
+// main will read and display the configuration
 func main() {
 	c, confErr := templig.FromFile[Config]("my_config.yaml")
 
@@ -148,11 +150,13 @@ import (
 	"github.com/AlphaOne1/templig"
 )
 
+// Config is the configuration structure
 type Config struct {
 	ID   int    `yaml:"id"`
 	Name string `yaml:"name"`
 }
 
+// main will read and display the configuration
 func main() {
 	c, confErr := templig.FromFile[Config](
 		"my_config.yaml",
@@ -168,7 +172,7 @@ func main() {
 }
 ```
 
-That way, the different configuration files are read in order, with he first one as the base. Every additional file
+That way, the different configuration files are read in order, with the first one as the base. Every additional file
 gives changes to all the ones read before. In this example, changing the name. Running this program would give:
 
 ```text
@@ -216,7 +220,7 @@ pass: {{ read "pass.txt" | required "password required" | quote }}
 ```
 
 One can see the templating code between the double curly braces `{{` and `}}`. 
-The following programm is essentially the same as in the [Simple Case](#simple-case).
+The following program is essentially the same as in the [Simple Case](#simple-case).
 It just adds the `pass` field to the configuration: 
 
 ```go
@@ -229,12 +233,14 @@ import (
 	"github.com/AlphaOne1/templig"
 )
 
+// Config is the configuration structure
 type Config struct {
 	ID   int    `yaml:"id"`
 	Name string `yaml:"name"`
 	Pass string `yaml:"pass"`
 }
 
+// main will read and display the configuration
 func main() {
 	c, confErr := templig.FromFile[Config]("my_config.yaml")
 
@@ -266,6 +272,7 @@ import (
 	"github.com/AlphaOne1/templig"
 )
 
+// Config is the configuration structure
 type Config struct {
     ID   int    `yaml:"id"`
     Name string `yaml:"name"`
@@ -287,6 +294,7 @@ func (c *Config) Validate() error {
 	return errors.Join(result...)
 }
 
+// main will read and display the configuration
 func main() {
 	c, confErr := templig.FromFile[Config]("my_config_good.yaml")
 
@@ -322,7 +330,7 @@ plain text to any location.
       c.To(os.Stdout)
       ```
 
-      This programm will produce the following, structurally identical output to the input configuration:
+      This program will produce the following, structurally identical output to the input configuration:
 
       ```yaml
       id:   23
@@ -366,5 +374,5 @@ plain text to any location.
         - '****************'
       ```
 
-Single passwords, are always replace by an equally lengthened string of `*`.
+Single passwords are always replaced by a string of `*` of equal length.
 An example usage can be found [here](examples/templating/env).
