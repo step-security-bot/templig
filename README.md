@@ -65,16 +65,25 @@
 templig
 =======
 
-*templig* (pronounced [ˈtɛmplɪç]) is a non-intrusive configuration library that utilizes the text templating engine and
-the functions best known from [helm](https://github.com/helm/helm) charts, originating from
+*templig* (pronounced [ˈtɛmplɪç]) is a non-intrusive configuration library that utilizes the text-templating
+engine of Go and the functions best known from [Helm](https://github.com/helm/helm) charts, originating from
 [Masterminds/sprig](https://github.com/Masterminds/sprig).
 Its primary goal is to enable dynamic configuration files, that have access to the system environment to fill
-information using function like `env` and `read`. To facilitate different environments, overlays can be defined,
-that amend a base configuration with environment specific attributes and changes.
-Configurations providing the methods for the `Validator` interface also have automated checking on load enabled.
+information using functions like `env` and `read`. To facilitate different environments, overlays can be defined
+that amend a base configuration with environment-specific attributes and changes.
+Configurations that implement the `Validator` interface also have automated checking enabled upon loading.
 
-Usage
------
+Installation
+------------
+
+To install *templig*, you can use the following command:
+
+```bash
+$ go get github.com/AlphaOne1/templig
+```
+
+Getting Started
+---------------
 
 ### Simple Case
 
@@ -183,12 +192,12 @@ Name: Important ProdName
 
 As expected, the value of `Name` was replaced by the one provided in overlay configuration.
 
-### Template functionality
+### Template Functionality
 #### Overview
 
-*templig* supports templating the configuration files. On top of the few templating functions provided by the Go
-`text/template` library, the functions of [sprig](http://github.com/Masterminds/sprig), that are maybe best known for
-their use in [helm](https://github.com/helm/helm) charts. On top of that, the following functions are provided for
+*templig* supports templating the configuration files. In addition to the basic templating functions provided by the Go
+`text/template` library, *templig* includes the functions from [sprig](http://github.com/Masterminds/sprig), which are perhaps best known for
+their use in [Helm](https://github.com/helm/helm) charts. On top of that, the following functions are provided for
 convenience:
 
 | Function | Description                                                         | Example                            |
@@ -201,7 +210,7 @@ convenience:
 The expansion of the templated parts is done __before__ overlaying takes place. Any errors of templating will thus be
 displayed in their respective source locations.
 
-#### Reading environment
+#### Reading Environment
 
 Having a templated configuration file like this one:
 
@@ -211,7 +220,7 @@ name: Interesting Name
 pass: {{ env "PASSWORD" | required "password required" | quote }}
 ```
 
-or this one;
+or this one:
 
 ```yaml
 id:   23
@@ -281,7 +290,7 @@ type Config struct {
 // Validate fulfills the Validator interface provided by templig.
 // This method is called, if it is defined. It influences the outcome of the configuration reading.
 func (c *Config) Validate() error {
-    result := make([]error, 0)
+    var result []error
 
 	if len(c.Name) == 0 {
 		result = append(result, errors.New("name is required"))
