@@ -1,3 +1,8 @@
+Release 0.6.2
+=============
+
+- update x/crypto dependency 0.34.0 -> 0.35.0
+
 Release 0.6.1
 =============
 
