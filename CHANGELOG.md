@@ -1,3 +1,8 @@
+Release 0.7.0
+=============
+
+- give user the possibility to disallow additional templig template functions or add own ones
+
 Release 0.6.1
 =============
 

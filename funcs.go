@@ -6,6 +6,7 @@ package templig
 import (
 	"errors"
 	"io"
+	"maps"
 	"os"
 	"slices"
 	"strings"
@@ -14,13 +15,22 @@ import (
 	"github.com/Masterminds/sprig/v3"
 )
 
+// TemplateFunctions is a template.FuncMap that allows to globally remove the additional templig template functions or
+// even add own functions on top of what is already provided. For user provided functions, please use the prefix `uP`,
+// that is guaranteed to never be used as a templig provided function.
+var TemplateFunctions = template.FuncMap{
+	"arg":      argumentValue,
+	"hasArg":   argumentPresent,
+	"required": required,
+	"read":     readFile,
+}
+
 // templigFunctions gives all the functions that are enabled for the templating engine.
 func templigFunctions() template.FuncMap {
 	result := sprig.TxtFuncMap()
-	result["arg"] = argumentValue
-	result["hasArg"] = argumentPresent
-	result["required"] = required
-	result["read"] = readFile
+
+	maps.Insert(result, maps.All(TemplateFunctions))
+
 	return result
 }
 
