@@ -10,7 +10,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// SecretDefaultRE is the default regular expression used to identify secret values automatically.
+// SecretDefaultRE is the default regular expression used to identify secret values automatically. All input to the
+// regular expression is preprocessed using the strings.ToLower function, to not unnecessarily complicate the regexp.
 const SecretDefaultRE = "(key)|(secret)|(pass)|(password)|(cert)|(certificate)"
 
 // SecretRE is the regular expression used to identify secret values automatically.
@@ -26,7 +27,7 @@ func HideSecrets(n *yaml.Node, hideStructure bool) {
 
 	if n.Kind == yaml.MappingNode {
 		for i := 0; i < len(n.Content); i += 2 {
-			if SecretRE.Match([]byte(n.Content[i].Value)) {
+			if SecretRE.MatchString(strings.ToLower(n.Content[i].Value)) {
 				hideAll(n.Content[i+1], hideStructure)
 			} else {
 				HideSecrets(n.Content[i+1], hideStructure)

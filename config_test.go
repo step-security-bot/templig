@@ -550,6 +550,10 @@ func TestSecretsHidden(t *testing.T) {
 	if strings.Contains(buf.String(), "pass0") || strings.Contains(buf.String(), "pass1") {
 		t.Errorf("found secrets in normally secrets-hidden output")
 	}
+
+	if !strings.Contains(buf.String(), "passes: '*'") {
+		t.Errorf("did not find replaced pass secret:\n%v", buf.String())
+	}
 }
 
 func TestSecretsHiddenStructured(t *testing.T) {
@@ -563,6 +567,14 @@ func TestSecretsHiddenStructured(t *testing.T) {
 
 	if strings.Contains(buf.String(), "pass0") || strings.Contains(buf.String(), "pass1") {
 		t.Errorf("found secrets in normally secrets-hidden output")
+	}
+
+	if !strings.Contains(buf.String(), "passes:\n") {
+		t.Errorf("did not find replaced pass secret:\n%v", buf.String())
+	}
+
+	if strings.Count(buf.String(), "'*****'") != 2 {
+		t.Errorf("did not find replaced pass secrets:\n%v", buf.String())
 	}
 }
 

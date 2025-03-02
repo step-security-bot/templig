@@ -8,6 +8,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/AlphaOne1/templig"
@@ -29,5 +30,8 @@ func main() {
 		fmt.Printf("ID:   %v\n", c.Get().ID)
 		fmt.Printf("Name: %v\n", c.Get().Name)
 		fmt.Printf("Pass: %v\n", strings.Repeat("*", len(c.Get().Pass)))
+
+		fmt.Println("Config printed by templig with hidden secrets:")
+		_ = c.ToSecretsHiddenStructured(os.Stdout)
 	}
 }

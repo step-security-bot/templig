@@ -173,7 +173,7 @@ func (c *Config[T]) ToSecretsHidden(w io.Writer) error {
 	var writeErr error = nil
 	node := yaml.Node{}
 
-	encodeErr := node.Decode(c.content)
+	encodeErr := node.Encode(c.content)
 
 	if encodeErr == nil {
 		HideSecrets(&node, true)
@@ -204,7 +204,7 @@ func (c *Config[T]) ToSecretsHiddenStructured(w io.Writer) error {
 	var writeErr error = nil
 	node := yaml.Node{}
 
-	encodeErr := node.Decode(c.content)
+	encodeErr := node.Encode(c.content)
 
 	if encodeErr == nil {
 		HideSecrets(&node, false)

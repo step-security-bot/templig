@@ -1,3 +1,11 @@
+Release 0.6.1
+=============
+
+- fix not printing using secret hiding
+- documentation for configuration printing and secret hiding
+- extended templating/env example to print configuration hiding secrets
+- improve secret detection mechanism
+
 Release 0.6.0
 =============
 
