@@ -21,7 +21,7 @@ type Config struct {
 // Validate fulfills the Validator interface provided by templig.
 // This method is called, if it is defined. It influences the outcome of the configuration reading.
 func (c *Config) Validate() error {
-	result := make([]error, 0)
+	var result []error
 
 	if len(c.Name) == 0 {
 		result = append(result, errors.New("name is required"))
