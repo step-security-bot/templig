@@ -3,6 +3,11 @@ Release 0.7.0
 
 - give user the possibility to disallow additional templig template functions or add own ones
 
+Release 0.6.2
+=============
+
+- update x/crypto dependency 0.34.0 -> 0.35.0
+
 Release 0.6.1
 =============
 
