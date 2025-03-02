@@ -345,7 +345,7 @@ plain text to any location.
       ```yaml
       id:   23
       name: Interesting Name
-      pass: *
+      pass: '*'
       ```
 
    3. `ToSecretsHiddenStructured` writes the configuration, hiding secrets, but letting their structure recognizable.
@@ -362,8 +362,8 @@ plain text to any location.
       id:   23
       name: Interesting Name
       pass:
-        - ***********
-        - ****************
+        - '***********'
+        - '****************'
       ```
 
 Single passwords, are always replace by an equally lengthened string of `*`.
