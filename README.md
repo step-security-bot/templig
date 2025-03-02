@@ -306,3 +306,65 @@ A non-exhaustive list of these:
 * https://github.com/omissis/go-jsonschema (JSON Schema)
 * https://github.com/ogen-go/ogen (OpenAPI 3.x)
 * https://github.com/go-swagger/go-swagger (OpenAPI 2.0 / Swagger 2.0)
+
+### Output & Secret Hiding
+
+On program start, it is advisable to output the basic parameters controlling the following execution. However, many
+configurations contain secrets, credentials for databases, access tokens etc. These should normally not be printed in
+plain text to any location.
+
+*templig* offers several possibilities to write the final configuration to a `Writer`:
+
+   1. `To` writes the configuration completely, that is including secrets, to the given `Writer`.
+ 
+      ```go
+      c, _ := FromFile[Config]("my_config.yaml")
+      c.To(os.Stdout)
+      ```
+
+      This programm will produce the following, structurally identical output to the input configuration:
+
+      ```yaml
+      id:   23
+      name: Interesting Name
+      passes:
+        - secretPass0
+        - alternativePass1
+      ```
+      
+   2. `ToSecretsHidden` writes the configuration, hiding secrets recognized using the `SecretRE` regular expression.
+      The example of 1. will then become:
+
+      ```go
+      c, _ := FromFile[Config]("my_config.yaml")
+      c.ToSecretsHidden(os.Stdout)
+      ```
+
+      With the new output to be:
+      
+      ```yaml
+      id:   23
+      name: Interesting Name
+      pass: *
+      ```
+
+   3. `ToSecretsHiddenStructured` writes the configuration, hiding secrets, but letting their structure recognizable.
+      The example of 1. will then become:
+
+      ```go
+      c, _ := FromFile[Config]("my_config.yaml")
+      c.ToSecretsHiddenStructured(os.Stdout)
+      ```
+
+      With the new output to be:
+
+      ```yaml
+      id:   23
+      name: Interesting Name
+      pass:
+        - ***********
+        - ****************
+      ```
+
+Single passwords, are always replace by an equally lengthened string of `*`.
+An example usage can be found [here](examples/templating/env).
