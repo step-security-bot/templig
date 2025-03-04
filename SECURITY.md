@@ -10,6 +10,10 @@ Supported Versions
 | releases 0.x   | :white_check_mark: |
 | other branches | :x:                |
 
+As this project uses semantic versioning, it is safe to upgrade to a later minor version,
+i.e. an upgrade from v0.3.0 to v0.7.0 is without worries.
+
+
 Reporting a Vulnerability
 -------------------------
 

@@ -73,6 +73,7 @@ information using functions like `env` and `read`. To facilitate different envir
 that amend a base configuration with environment-specific attributes and changes.
 Configurations that implement the `Validator` interface also have automated checking enabled upon loading.
 
+
 Installation
 ------------
 
@@ -81,6 +82,7 @@ To install *templig*, you can use the following command:
 ```bash
 $ go get github.com/AlphaOne1/templig
 ```
+
 
 Getting Started
 ---------------
@@ -132,6 +134,7 @@ read errors: <nil>
 ID:   23
 Name: Interesting Name
 ```
+
 
 ### Reading with Overlays
 
@@ -192,6 +195,7 @@ Name: Important ProdName
 
 As expected, the value of `Name` was replaced by the one provided in overlay configuration.
 
+
 ### Template Functionality
 #### Overview
 
@@ -209,6 +213,7 @@ convenience:
 
 The expansion of the templated parts is done __before__ overlaying takes place. Any errors of templating will thus be
 displayed in their respective source locations.
+
 
 #### Reading Environment
 
@@ -262,6 +267,7 @@ func main() {
 	}
 }
 ```
+
 
 ### Validation
 
@@ -320,9 +326,13 @@ e.g. JSON Schema or its embedded form in OpenAPI 2 or 3.
 
 A non-exhaustive list of these:
 
-* https://github.com/omissis/go-jsonschema (JSON Schema)
+* https://github.com/xeipuuv/gojsonschema (JSON Schema)
+* https://github.com/atombender/go-jsonschema (JSON Schema)
 * https://github.com/ogen-go/ogen (OpenAPI 3.x)
 * https://github.com/go-swagger/go-swagger (OpenAPI 2.0 / Swagger 2.0)
+
+An example combining generation and templating can be found [here](examples/configSchema).
+
 
 ### Output & Secret Hiding
 

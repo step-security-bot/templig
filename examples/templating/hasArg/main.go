@@ -20,6 +20,9 @@ type Config struct {
 	Pass string `yaml:"pass"`
 }
 
+// main reads a configuration file. The configuration file then uses the hasArg templig function to see, if the
+// parameter passEnv has been set, to decide, if it should be read from the environment or the default be used.
+// Note that there is no specific adaption in this main function to get this functionality.
 func main() {
 	c, confErr := templig.FromFile[Config]("my_config.yaml")
 

@@ -20,6 +20,8 @@ type Config struct {
 	Pass string `yaml:"pass"`
 }
 
+// main reads a configuration file. That configuration file then uses the read templig function to read a file with
+// additional information. Note that there is no specific adaption in this main function, to make this possible.
 func main() {
 	c, confErr := templig.FromFile[Config]("my_config.yaml")
 
