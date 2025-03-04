@@ -1,0 +1,6 @@
+env: dev
+database:
+    url: mydb.instance.db
+    user: myDBUser
+    pass: {{ read "dbpass" | required "need dbpass file to read db password" | quote }}
+listen_port: 1234

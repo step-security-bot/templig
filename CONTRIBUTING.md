@@ -4,6 +4,7 @@ Contributing
 Thanks for your interest in contributing to *templig*. Please take a moment to
 review this document __before submitting a pull request__.
 
+
 Pull requests
 -------------
 
@@ -18,6 +19,7 @@ to first discuss any new ideas. Your ideas and suggestions are welcome!
 Please ensure that the tests are passing when submitting a pull request. If
 you're adding new features to ActiveAdmin, please include tests.
 
+
 Where do I go from here?
 ------------------------
 
@@ -25,10 +27,12 @@ For any questions, support, or ideas, etc.
 [please create a GitHub discussion](https://github.com/AlphaOne1/templig/discussions/new).
 If you've noticed a bug, [please submit an issue][new issue].
 
+
 ### Fork and create a branch
 
 If this is something you think you can fix, then [fork templig] and create a
 branch with a descriptive name.
+
 
 ### Get the test suite running
 
@@ -40,6 +44,7 @@ You can run the test suite from the base folder using the following command:
 go test ./...
 ```
 
+
 ### Implement your fix or feature
 
 At this point, you're ready to make your changes. Feel free to ask for help.
@@ -49,6 +54,7 @@ Be sure to have run the go fmt tool, to have a unified code style:
 go fmt ./...
 ```
 
+
 ### Test your feature
 
 After you implemented your feature, add tests that cover all major code paths. A
@@ -56,6 +62,7 @@ test coverage of 100% is not always possible. We acknowledge, that there are har
 to trigger conditions, that you might check for, but are not producible in a test
 suite, but aim for the best. At least every code path of normal, input triggered
 use, should be covered.
+
 
 ### Document your feature
 
@@ -72,6 +79,7 @@ changes of the current major version since x.0.0. On major release, the CHANGELO
 can be emptied as the older changes are still visible in the history of the version
 control system.
 
+
 ### Create a Pull Request
 
 At this point, if your changes look good and tests are passing, you are ready to
@@ -82,6 +90,7 @@ tests that most likely did not run in the developers machine (CodeQL, Trivy). Th
 tests may produce warnings. Take those warnings serious even if they seem harmless.
 Too many harmless warnings could possibly overlay really serious ones, so all
 warnings are to be resolved.
+
 
 Merging a PR (maintainers only)
 -------------------------------

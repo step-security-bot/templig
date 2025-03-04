@@ -34,6 +34,8 @@ func (c *Config) Validate() error {
 	return errors.Join(result...)
 }
 
+// main reads a configuration file. Note that the validation is done inside of the template reading, so the
+// code in main does not need specific modifications.
 func main() {
 	_, confErr := templig.FromFile[Config]("my_config_bad.yaml")
 

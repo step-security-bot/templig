@@ -18,6 +18,7 @@ type Config struct {
 	Name string `yaml:"name"`
 }
 
+// main reads a single configuration file
 func main() {
 	c, confErr := templig.FromFile[Config]("my_config.yaml")
 
