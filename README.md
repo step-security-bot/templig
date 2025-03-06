@@ -68,11 +68,19 @@ templig
 *templig* (pronounced [ˈtɛmplɪç]) is a non-intrusive configuration library that utilizes the text-templating
 engine of Go and the functions best known from [Helm](https://github.com/helm/helm) charts, originating from
 [Masterminds/sprig](https://github.com/Masterminds/sprig).
+
 Its primary goal is to enable dynamic configuration files, that have access to the system environment to fill
 information using functions like `env` and `read`. To facilitate different environments, overlays can be defined
 that amend a base configuration with environment-specific attributes and changes.
 Configurations that implement the `Validator` interface also have automated checking enabled upon loading.
 
+This is not the first configuration library and surely will not be the last. There exist alternatives, the most
+elaborate of them may be [viper](https://github.com/spf13/viper). The difference to basically all of these is that
+they burden the developer to provide all the means to gather the configuration information. So if the developer 
+does not foresee a means to read a value from the environment, a user cannot use this. *templig* turns that
+around and gives the developer a simple interface to do what he wants—read a config—and gives the user the means
+to compile his configuration in whatever way he sees fit. Experience shows that the target system environments can
+be extremely diverse, and limiting the possibilities of end users directly limits the spectrum of application.
 
 Installation
 ------------
