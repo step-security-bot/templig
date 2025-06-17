@@ -3,6 +3,7 @@ Release 0.8.0
 
 - add example for config object generation from JSON schema
 - more documentation in examples
+- updated dependencies
 
 Release 0.7.0
 =============
