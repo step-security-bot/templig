@@ -149,6 +149,7 @@ func mergeAddValue(a, key, value *yaml.Node) error {
 	}
 
 	a.Content = append(a.Content, key, value)
+
 	return nil
 }
 

@@ -1,7 +1,7 @@
 // Copyright the templig contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-package templig
+package templig_test
 
 import (
 	"bytes"
@@ -11,6 +11,8 @@ import (
 	"slices"
 	"strings"
 	"testing"
+
+	"github.com/AlphaOne1/templig"
 )
 
 type TestConn struct {
@@ -284,13 +286,13 @@ func TestReadConfig(t *testing.T) {
 			os.Args = append(os.Args, test.args...)
 		}
 
-		var c *Config[TestConfig]
+		var c *templig.Config[TestConfig]
 		var fromErr error
 
 		if len(test.in) > 0 {
-			c, fromErr = From[TestConfig](&testBuf)
+			c, fromErr = templig.From[TestConfig](&testBuf)
 		} else if len(test.inFile) > 0 {
-			c, fromErr = FromFile[TestConfig](test.inFile)
+			c, fromErr = templig.FromFile[TestConfig](test.inFile)
 		} else {
 			t.Errorf("%v: neither input data nor input file given", k)
 		}
@@ -344,7 +346,7 @@ func TestReadConfig(t *testing.T) {
 }
 
 func TestNoReaders(t *testing.T) {
-	c, fromErr := From[TestConfig]()
+	c, fromErr := templig.From[TestConfig]()
 
 	if fromErr == nil {
 		t.Errorf("reading from broken reader should have returned an error")
@@ -356,7 +358,7 @@ func TestNoReaders(t *testing.T) {
 }
 
 func TestReadOverlayConfig(t *testing.T) {
-	config, configErr := FromFile[TestConfig](
+	config, configErr := templig.FromFile[TestConfig](
 		"testData/test_config_0.yaml",
 		"testData/test_config_0_overlay.yaml",
 	)
@@ -378,7 +380,7 @@ func TestReadOverlayConfigReader(t *testing.T) {
 	f0, _ := os.Open("testData/test_config_0.yaml")
 	f1, _ := os.Open("testData/test_config_0_overlay.yaml")
 
-	config, configErr := From[TestConfig](f0, f1)
+	config, configErr := templig.From[TestConfig](f0, f1)
 
 	if configErr != nil {
 		t.Errorf("no error expected reading multiple files: %v", configErr)
@@ -394,7 +396,7 @@ func TestReadOverlayConfigReader(t *testing.T) {
 }
 
 func TestReadOverlayConfigMismatch(t *testing.T) {
-	_, configErr := FromFile[TestConfig](
+	_, configErr := templig.FromFile[TestConfig](
 		"testData/test_config_0.yaml",
 		"testData/test_config_0_overlay_mismatch.yaml",
 	)
@@ -405,7 +407,7 @@ func TestReadOverlayConfigMismatch(t *testing.T) {
 }
 
 func TestReadOverlayConfigWrongType(t *testing.T) {
-	_, configErr := FromFile[TestConfig](
+	_, configErr := templig.FromFile[TestConfig](
 		"testData/test_config_0.yaml",
 		"testData/test_config_0_overlay_wrongtype.yaml",
 	)
@@ -426,7 +428,7 @@ func (b *BrokenIO) Write(_ []byte) (n int, err error) {
 }
 
 func TestBrokenReader(t *testing.T) {
-	c, fromErr := From[TestConfig](&BrokenIO{})
+	c, fromErr := templig.From[TestConfig](&BrokenIO{})
 
 	if fromErr == nil {
 		t.Errorf("reading from broken reader should have returned an error")
@@ -441,7 +443,7 @@ func TestReadOverlayConfigBrokenReader(t *testing.T) {
 	f0 := &BrokenIO{}
 	f1 := &BrokenIO{}
 
-	c, fromErr := From[TestConfig](f0, f1)
+	c, fromErr := templig.From[TestConfig](f0, f1)
 
 	if fromErr == nil {
 		t.Errorf("reading from broken reader should have returned an error")
@@ -453,7 +455,7 @@ func TestReadOverlayConfigBrokenReader(t *testing.T) {
 }
 
 func TestNonexistentFile(t *testing.T) {
-	c, fromErr := FromFile[TestConfig]("testData/test_does_not_exist.yaml")
+	c, fromErr := templig.FromFile[TestConfig]("testData/test_does_not_exist.yaml")
 
 	if fromErr == nil {
 		t.Errorf("reading from broken reader should have returned an error")
@@ -465,7 +467,7 @@ func TestNonexistentFile(t *testing.T) {
 }
 
 func TestNonexistentFileOverlayAddon(t *testing.T) {
-	c, fromErr := FromFile[TestConfig](
+	c, fromErr := templig.FromFile[TestConfig](
 		"testData/test_config_0.yaml",
 		"testData/test_does_not_exist.yaml",
 	)
@@ -480,7 +482,7 @@ func TestNonexistentFileOverlayAddon(t *testing.T) {
 }
 
 func TestNoFiles(t *testing.T) {
-	c, fromErr := FromFiles[TestConfig]([]string{})
+	c, fromErr := templig.FromFiles[TestConfig]([]string{})
 
 	if fromErr == nil {
 		t.Errorf("reading from broken reader should have returned an error")
@@ -492,7 +494,7 @@ func TestNoFiles(t *testing.T) {
 }
 
 func TestBrokenWriter(t *testing.T) {
-	c, _ := FromFile[TestConfig]("testData/test_config_0.yaml")
+	c, _ := templig.FromFile[TestConfig]("testData/test_config_0.yaml")
 
 	toErr := c.To(&BrokenIO{})
 
@@ -502,7 +504,7 @@ func TestBrokenWriter(t *testing.T) {
 }
 
 func TestWriteFile(t *testing.T) {
-	c, _ := FromFile[TestConfig]("testData/test_config_0.yaml")
+	c, _ := templig.FromFile[TestConfig]("testData/test_config_0.yaml")
 
 	err := c.ToFile("testData/test_config_written.yaml")
 
@@ -516,7 +518,7 @@ func TestWriteFile(t *testing.T) {
 
 	_ = c.To(&bufOrig)
 
-	cp, _ := FromFile[TestConfig]("testData/test_config_written.yaml")
+	cp, _ := templig.FromFile[TestConfig]("testData/test_config_written.yaml")
 	_ = cp.To(&bufCopy)
 
 	if bufOrig.String() != bufCopy.String() {
@@ -525,7 +527,7 @@ func TestWriteFile(t *testing.T) {
 }
 
 func TestWriteProtectedFile(t *testing.T) {
-	c, _ := FromFile[TestConfig]("testData/test_config_0.yaml")
+	c, _ := templig.FromFile[TestConfig]("testData/test_config_0.yaml")
 
 	if chmodErr := os.Chmod("testData/test_write_protected.yaml", 0400); chmodErr != nil {
 		t.Errorf("could not writeprotect file for test: %v", chmodErr)
@@ -539,7 +541,7 @@ func TestWriteProtectedFile(t *testing.T) {
 }
 
 func TestSecretsHidden(t *testing.T) {
-	c, _ := FromFile[TestConfig]("testData/test_config_0.yaml")
+	c, _ := templig.FromFile[TestConfig]("testData/test_config_0.yaml")
 
 	buf := bytes.Buffer{}
 
@@ -557,7 +559,7 @@ func TestSecretsHidden(t *testing.T) {
 }
 
 func TestSecretsHiddenStructured(t *testing.T) {
-	c, _ := FromFile[TestConfig]("testData/test_config_0.yaml")
+	c, _ := templig.FromFile[TestConfig]("testData/test_config_0.yaml")
 
 	buf := bytes.Buffer{}
 
@@ -594,7 +596,7 @@ func FuzzFromFileEnv(f *testing.F) {
 			return
 		}
 
-		_, confErr := FromFile[TestConfig]("testData/test_config_1.yaml")
+		_, confErr := templig.FromFile[TestConfig]("testData/test_config_1.yaml")
 
 		if confErr != nil && len(envVar) > 0 {
 			t.Errorf("got unexpected error on input -%v-: %v", envVar, confErr)
@@ -662,13 +664,13 @@ func TestReadConfigValidated(t *testing.T) {
 			}
 		}
 
-		var c *Config[TestConfigValidated]
+		var c *templig.Config[TestConfigValidated]
 		var fromErr error
 
 		if len(test.in) > 0 {
-			c, fromErr = From[TestConfigValidated](&testBuf)
+			c, fromErr = templig.From[TestConfigValidated](&testBuf)
 		} else if len(test.inFile) > 0 {
-			c, fromErr = FromFile[TestConfigValidated](test.inFile)
+			c, fromErr = templig.FromFile[TestConfigValidated](test.inFile)
 		} else {
 			t.Errorf("%v: neither input data nor input file given", k)
 		}

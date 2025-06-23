@@ -1,13 +1,15 @@
 // Copyright the templig contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-package templig
+package templig_test
 
 import (
 	"bytes"
 	"testing"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/AlphaOne1/templig"
 )
 
 func TestHideSecrets(t *testing.T) {
@@ -140,10 +142,11 @@ func TestHideSecrets(t *testing.T) {
 
 		if encodeErr != nil {
 			t.Errorf("%v: could not encode value", k)
+
 			continue
 		}
 
-		HideSecrets(&node, test.hideStructure)
+		templig.HideSecrets(&node, test.hideStructure)
 
 		if err := yaml.NewEncoder(&gotBuf).Encode(&node); err != nil {
 			t.Errorf("%v: Got error serializing got", k)
@@ -164,7 +167,7 @@ func TestHideSecrets(t *testing.T) {
 func TestHideSecretsNil(t *testing.T) {
 	var a *yaml.Node = nil
 
-	HideSecrets(a, true)
+	templig.HideSecrets(a, true)
 }
 
 func TestHideSecretAlias(t *testing.T) {
@@ -181,12 +184,13 @@ pass: *ref
 
 	if decodeErr := yaml.NewDecoder(bytes.NewBufferString(in)).Decode(node); decodeErr != nil {
 		t.Errorf("unexpted encode error: %v", decodeErr)
+
 		return
 	}
 
 	buf := bytes.Buffer{}
 
-	HideSecrets(node, true)
+	templig.HideSecrets(node, true)
 
 	if encodeErr := yaml.NewEncoder(&buf).Encode(node); encodeErr != nil {
 		t.Errorf("could not encode node: %v", encodeErr)

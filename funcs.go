@@ -63,6 +63,7 @@ func readFile(fileName string) (any, error) {
 func argumentValue(name string) (any, error) {
 	index := slices.IndexFunc(os.Args, func(s string) bool {
 		tmp := strings.TrimLeft(s, "-")
+
 		return len(tmp) != len(s) && strings.HasPrefix(tmp, name)
 	})
 
@@ -75,7 +76,7 @@ func argumentValue(name string) (any, error) {
 		}
 	}
 
-	// handle arguments, with the value in the next argument
+	// handle arguments with the value in the next argument
 	// (that then may not start with a dash)
 	if index >= 0 &&
 		len(os.Args) > index+1 &&
@@ -91,6 +92,7 @@ func argumentValue(name string) (any, error) {
 func argumentPresent(name string) (any, error) {
 	index := slices.IndexFunc(os.Args, func(s string) bool {
 		tmp := strings.TrimLeft(s, "-")
+
 		return tmp != s && strings.HasPrefix(tmp, name)
 	})
 
