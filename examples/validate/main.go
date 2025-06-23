@@ -19,7 +19,7 @@ type Config struct {
 }
 
 // Validate fulfills the Validator interface provided by templig.
-// This method is called, if it is defined. It influences the outcome of the configuration reading.
+// This method is called if it is defined. It influences the outcome of the configuration reading.
 func (c *Config) Validate() error {
 	var result []error
 
@@ -34,7 +34,7 @@ func (c *Config) Validate() error {
 	return errors.Join(result...)
 }
 
-// main reads a configuration file. Note that the validation is done inside of the template reading, so the
+// main reads a configuration file. Note that the validation is done inside the template reading, so the
 // code in main does not need specific modifications.
 func main() {
 	_, confErr := templig.FromFile[Config]("my_config_bad.yaml")
