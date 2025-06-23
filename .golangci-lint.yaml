@@ -1,0 +1,64 @@
+# Copyright the templig contributors.
+# SPDX-License-Identifier: MPL-2.0
+
+# Configuration file for golangci-lint
+# See https://golangci-lint.run/usage/configuration/ for more information
+
+version: "2"
+
+run:
+    timeout: 5m
+    tests: true
+
+linters:
+    default: all
+
+    disable:
+        - wsl
+
+    exclusions:
+        warn-unused: true
+
+        rules:
+            - path: _test\.go
+              linters:
+                  - cyclop
+                  - dupword
+                  - funlen
+                  - gocognit
+                  - maintidx
+                  - nestif
+
+    settings:
+        cyclop:
+            max-complexity: 25
+
+        depguard:
+            rules:
+                main:
+                    files:
+                        - $all
+                        - "!**/*_test.go"
+                    allow:
+                        - $gostd
+                        - gopkg.in/yaml.v3
+                        - github.com/Masterminds/sprig/v3
+                test:
+                    files:
+                        - "**/*_test.go"
+                    allow:
+                        - $gostd
+                        - gopkg.in/yaml.v3
+                        - github.com/Masterminds/sprig/v3
+                        - github.com/AlphaOne1/templig
+
+        mnd:
+            ignored-numbers:
+                - 2
+
+        testpackage:
+            skip-regexp: internal_test\.go
+
+issues:
+    max-issues-per-linter: 0
+    max-same-issues: 0

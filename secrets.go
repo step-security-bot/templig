@@ -41,14 +41,15 @@ func HideSecrets(n *yaml.Node, hideStructure bool) {
 }
 
 func hideAll(n *yaml.Node, hideStructure bool) {
-	if n.Kind == yaml.ScalarNode {
+	switch n.Kind {
+	case yaml.ScalarNode:
 		n.Tag = "!!str"
 		n.Value = strings.Repeat("*", len(n.Value))
-	} else if n.Kind == yaml.AliasNode {
+	case yaml.AliasNode:
 		if n.Alias != nil {
 			hideAll(n.Alias, hideStructure)
 		}
-	} else {
+	default:
 		if hideStructure {
 			n.Kind = yaml.ScalarNode
 			n.Tag = "!!str"

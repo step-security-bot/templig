@@ -1,14 +1,15 @@
 Release 0.8.0
 =============
 
-- add example for config object generation from JSON schema
+- add an example for config object generation from JSON schema
 - more documentation in examples
 - updated dependencies
+- add golangci-lint checks
 
 Release 0.7.0
 =============
 
-- give user the possibility to disallow additional templig template functions or add own ones
+- give user the possibility to disallow additional templig template functions or add their own ones
 
 Release 0.6.2
 =============
@@ -45,9 +46,9 @@ Release 0.4.1
 Release 0.4.0
 =============
 
-- use parse structure of YAML documents for secrets hiding
+- use parse structure of YAML documents for secret hiding
 - documentation fixes
-- node based function `HideSecrets`, to hide secret in configurations
+- node-based function `HideSecrets`, to hide secret in configurations
 
 Release 0.3.0
 =============

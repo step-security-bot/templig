@@ -22,7 +22,7 @@ type Config struct {
 }
 
 // main reads a configuration file. The configuration file then uses the env template function to read the password
-// from the environment. There is not specific adaption in this main function to facilitate that functionality.
+// from the environment. There is no specific adaption in this main function to facilitate that functionality.
 func main() {
 	c, confErr := templig.FromFile[Config]("my_config.yaml")
 

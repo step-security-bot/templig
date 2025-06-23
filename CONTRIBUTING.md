@@ -48,7 +48,7 @@ go test ./...
 ### Implement your fix or feature
 
 At this point, you're ready to make your changes. Feel free to ask for help.
-Be sure to have run the go fmt tool, to have a unified code style:
+Be sure to have run the go fmt tool to have a unified code style:
 
 ```bash
 go fmt ./...
@@ -57,11 +57,11 @@ go fmt ./...
 
 ### Test your feature
 
-After you implemented your feature, add tests that cover all major code paths. A
-test coverage of 100% is not always possible. We acknowledge, that there are hard
-to trigger conditions, that you might check for, but are not producible in a test
-suite, but aim for the best. At least every code path of normal, input triggered
-use, should be covered.
+After implementing your feature, add tests that cover all major code paths. A
+test coverage of 100% is not always possible. We acknowledge that there are hard
+to trigger conditions that you might check for, but are not producible in a test
+suite, but aim for the best. At least every code path of normal, input-triggered
+use should be covered.
 
 
 ### Document your feature
@@ -75,7 +75,7 @@ include:
 - update the CHANGELOG.md
 
 The CHANGELOG document contains the changes of the next major contains all the
-changes of the current major version since x.0.0. On major release, the CHANGELOG
+changes of the current major version since x.0.0. On a major release, the CHANGELOG
 can be emptied as the older changes are still visible in the history of the version
 control system.
 
@@ -86,7 +86,7 @@ At this point, if your changes look good and tests are passing, you are ready to
 create a pull request.
 
 GitHub Actions will run the test suite against the latest Go version. There are
-tests that most likely did not run in the developers machine (CodeQL, Trivy). These
+tests that most likely did not run on the developers machine (CodeQL, Trivy). These
 tests may produce warnings. Take those warnings serious even if they seem harmless.
 Too many harmless warnings could possibly overlay really serious ones, so all
 warnings are to be resolved.
@@ -95,7 +95,7 @@ warnings are to be resolved.
 Merging a PR (maintainers only)
 -------------------------------
 
-A Pull Request can only be merged into master by a maintainer if:
+A maintainer can only merge a Pull Request into master if:
 
 - CI is passing,
 - approved by another maintainer

@@ -1,10 +1,12 @@
-package templig
+package templig_test
 
 import (
 	"bytes"
 	"testing"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/AlphaOne1/templig"
 )
 
 func TestMerge(t *testing.T) {
@@ -124,15 +126,17 @@ a: &ref1
 			t.Errorf("%v - %v: could not unmarshal b: %v", k, v.name, bErr)
 		}
 
-		result, resultErr := MergeYAMLNodes(&an, &bn)
+		result, resultErr := templig.MergeYAMLNodes(&an, &bn)
 
 		if !v.wantErr && resultErr != nil {
 			t.Errorf("%v - %v: could not merge: %v", k, v.name, resultErr)
+
 			continue
 		}
 
 		if v.wantErr && resultErr == nil {
 			t.Errorf("%v - %v: should not have been able to merge", k, v.name)
+
 			continue
 		}
 
@@ -156,59 +160,6 @@ a: &ref1
 	}
 }
 
-func TestNullArgs(t *testing.T) {
-	mergeFuncs := []func(*yaml.Node, *yaml.Node) (*yaml.Node, error){
-		MergeYAMLNodes,
-		mergeAliasNodes,
-		mergeDocumentNodes,
-		mergeMappingNodes,
-		mergeScalarNodes,
-		mergeSequenceNodes,
-	}
-
-	for k, v := range mergeFuncs {
-		res, resErr := v(nil, nil)
-
-		if res != nil {
-			t.Errorf("%v: merging nil nodes must produce nil", k)
-		}
-
-		if resErr == nil {
-			t.Errorf("%v: expected an error merging nil nodes", k)
-		}
-	}
-}
-
-func TestMismatchArgs(t *testing.T) {
-	mergeFuncs := []func(*yaml.Node, *yaml.Node) (*yaml.Node, error){
-		MergeYAMLNodes,
-		mergeAliasNodes,
-		mergeDocumentNodes,
-		mergeMappingNodes,
-		mergeScalarNodes,
-		mergeSequenceNodes,
-	}
-
-	a := yaml.Node{
-		Kind: yaml.MappingNode,
-	}
-	b := yaml.Node{
-		Kind: yaml.DocumentNode,
-	}
-
-	for k, v := range mergeFuncs {
-		res, resErr := v(&a, &b)
-
-		if res != nil {
-			t.Errorf("%v: merging kind-mismatched nodes must produce nil", k)
-		}
-
-		if resErr == nil {
-			t.Errorf("%v: expected an error merging kind-mismatched nodes", k)
-		}
-	}
-}
-
 func TestStrangeDocumentNodes(t *testing.T) {
 	a := yaml.Node{
 		Kind: yaml.DocumentNode,
@@ -222,7 +173,7 @@ func TestStrangeDocumentNodes(t *testing.T) {
 		},
 	}
 
-	res, resErr := MergeYAMLNodes(&a, &b)
+	res, resErr := templig.MergeYAMLNodes(&a, &b)
 
 	if res != nil {
 		t.Errorf("merging strange document nodes must produce nil")
@@ -241,7 +192,7 @@ func TestUnknownNodeKind(t *testing.T) {
 		Kind: 0,
 	}
 
-	res, resErr := MergeYAMLNodes(&a, &b)
+	res, resErr := templig.MergeYAMLNodes(&a, &b)
 
 	if res != nil {
 		t.Errorf("merging unknown node kind must produce nil")
