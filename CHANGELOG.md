@@ -1,3 +1,9 @@
+Release 0.8.1
+=============
+
+- configured linter
+- adhered to linter comments
+
 Release 0.8.0
 =============
 

@@ -8,12 +8,12 @@ import (
 	"testing"
 )
 
-func TestMainGood(t *testing.T) {
+func TestMainGood( /* t */ *testing.T) {
 	os.Args = []string{"main", "--pass=bogus"}
 	main()
 }
 
-func TestMainBad(t *testing.T) {
+func TestMainBad( /* t */ *testing.T) {
 	os.Args = []string{"main"}
 	main()
 }

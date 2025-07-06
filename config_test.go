@@ -268,9 +268,9 @@ func TestReadConfig(t *testing.T) {
 
 	testBuf := bytes.Buffer{}
 
-	for k, test := range tests {
+	for testIndex, test := range tests {
 		if len(test.in) > 0 && len(test.inFile) > 0 {
-			t.Errorf("%v: input data and file given at the same time", k)
+			t.Errorf("%v: input data and file given at the same time", testIndex)
 		}
 
 		testBuf.Reset()
@@ -278,7 +278,7 @@ func TestReadConfig(t *testing.T) {
 
 		if test.env != nil {
 			for ei, ev := range test.env {
-				_ = os.Setenv(ei, ev)
+				t.Setenv(ei, ev)
 			}
 		}
 
@@ -286,48 +286,49 @@ func TestReadConfig(t *testing.T) {
 			os.Args = append(os.Args, test.args...)
 		}
 
-		var c *templig.Config[TestConfig]
+		var config *templig.Config[TestConfig]
 		var fromErr error
 
-		if len(test.in) > 0 {
-			c, fromErr = templig.From[TestConfig](&testBuf)
-		} else if len(test.inFile) > 0 {
-			c, fromErr = templig.FromFile[TestConfig](test.inFile)
-		} else {
-			t.Errorf("%v: neither input data nor input file given", k)
+		switch {
+		case len(test.in) > 0:
+			config, fromErr = templig.From[TestConfig](&testBuf)
+		case len(test.inFile) > 0:
+			config, fromErr = templig.FromFile[TestConfig](test.inFile)
+		default:
+			t.Errorf("%v: neither input data nor input file given", testIndex)
 		}
 
 		if test.wantErr && fromErr == nil {
-			t.Errorf("%v: wanted error but got nil", k)
+			t.Errorf("%v: wanted error but got nil", testIndex)
 		}
 		if !test.wantErr && fromErr != nil {
-			t.Errorf("%v: did not want error but got %v", k, fromErr)
+			t.Errorf("%v: did not want error but got %v", testIndex, fromErr)
 		}
 
-		if c != nil {
-			if c.Get().ID != test.want.ID {
-				t.Errorf("%v: wanted ID %v but got %v", k, test.want.ID, c.Get().ID)
+		if config != nil {
+			if config.Get().ID != test.want.ID {
+				t.Errorf("%v: wanted ID %v but got %v", testIndex, test.want.ID, config.Get().ID)
 			}
-			if c.Get().Name != test.want.Name {
-				t.Errorf("%v: wanted Name %v but got %v", k, test.want.Name, c.Get().Name)
+			if config.Get().Name != test.want.Name {
+				t.Errorf("%v: wanted Name %v but got %v", testIndex, test.want.Name, config.Get().Name)
 			}
-			if (c.Get().Conn != nil) != (test.want.Conn != nil) {
-				t.Errorf("%v: wanted Conn == nil -> %v but got %v", k,
+			if (config.Get().Conn != nil) != (test.want.Conn != nil) {
+				t.Errorf("%v: wanted Conn == nil -> %v but got %v", testIndex,
 					test.want.Conn != nil,
-					c.Get().Conn != nil)
+					config.Get().Conn != nil)
 			}
-			if c.Get().Conn != nil && test.want.Conn != nil {
-				if c.Get().Conn.URL != test.want.Conn.URL {
-					t.Errorf("%v: wanted URL %v but got %v", k, test.want.Conn.URL, c.Get().Conn.URL)
+			if config.Get().Conn != nil && test.want.Conn != nil {
+				if config.Get().Conn.URL != test.want.Conn.URL {
+					t.Errorf("%v: wanted URL %v but got %v", testIndex, test.want.Conn.URL, config.Get().Conn.URL)
 				}
 				for _, p := range test.want.Conn.Passes {
-					if !slices.Contains(c.Get().Conn.Passes, p) {
-						t.Errorf("%v: wanted passes to containt %v but was not there", k, p)
+					if !slices.Contains(config.Get().Conn.Passes, p) {
+						t.Errorf("%v: wanted passes to containt %v but was not there", testIndex, p)
 					}
 				}
-				for _, p := range c.Get().Conn.Passes {
+				for _, p := range config.Get().Conn.Passes {
 					if !slices.Contains(test.want.Conn.Passes, p) {
-						t.Errorf("%v: found pass %v but should not there", k, p)
+						t.Errorf("%v: found pass %v but should not there", testIndex, p)
 					}
 				}
 			}
@@ -482,6 +483,18 @@ func TestNonexistentFileOverlayAddon(t *testing.T) {
 }
 
 func TestNoFiles(t *testing.T) {
+	c, fromErr := templig.FromFile[TestConfig]([]string{}...)
+
+	if fromErr == nil {
+		t.Errorf("reading from broken reader should have returned an error")
+	}
+
+	if c != nil {
+		t.Errorf("reading from broken reader should have returned nil")
+	}
+}
+
+func TestNoFilesDeprecated(t *testing.T) {
 	c, fromErr := templig.FromFiles[TestConfig]([]string{})
 
 	if fromErr == nil {
@@ -504,9 +517,9 @@ func TestBrokenWriter(t *testing.T) {
 }
 
 func TestWriteFile(t *testing.T) {
-	c, _ := templig.FromFile[TestConfig]("testData/test_config_0.yaml")
+	config, _ := templig.FromFile[TestConfig]("testData/test_config_0.yaml")
 
-	err := c.ToFile("testData/test_config_written.yaml")
+	err := config.ToFile("testData/test_config_written.yaml")
 
 	if err != nil {
 		t.Errorf("writing to file should work")
@@ -516,7 +529,7 @@ func TestWriteFile(t *testing.T) {
 	bufOrig := bytes.Buffer{}
 	bufCopy := bytes.Buffer{}
 
-	_ = c.To(&bufOrig)
+	_ = config.To(&bufOrig)
 
 	cp, _ := templig.FromFile[TestConfig]("testData/test_config_written.yaml")
 	_ = cp.To(&bufCopy)
@@ -592,17 +605,17 @@ func FuzzFromFileEnv(f *testing.F) {
 	f.Add("test")
 
 	f.Fuzz(func(t *testing.T, envVar string) {
-		if setEnvErr := os.Setenv("PASS1", envVar); setEnvErr != nil {
+		if slices.Contains([]rune(envVar), 0) {
 			return
 		}
+
+		t.Setenv("PASS1", envVar)
 
 		_, confErr := templig.FromFile[TestConfig]("testData/test_config_1.yaml")
 
 		if confErr != nil && len(envVar) > 0 {
 			t.Errorf("got unexpected error on input -%v-: %v", envVar, confErr)
 		}
-
-		_ = os.Unsetenv("PASS1")
 	})
 }
 
@@ -614,9 +627,9 @@ type TestConfigValidated struct {
 func (c *TestConfigValidated) Validate() error {
 	if c.ID == 9 {
 		return nil
-	} else {
-		return fmt.Errorf("expected id 9 to be valid")
 	}
+
+	return fmt.Errorf("expected id 9 to be valid")
 }
 func TestReadConfigValidated(t *testing.T) {
 	tests := []struct {
@@ -650,9 +663,9 @@ func TestReadConfigValidated(t *testing.T) {
 
 	testBuf := bytes.Buffer{}
 
-	for k, test := range tests {
+	for testNum, test := range tests {
 		if len(test.in) > 0 && len(test.inFile) > 0 {
-			t.Errorf("%v: input data and file given at the same time", k)
+			t.Errorf("%v: input data and file given at the same time", testNum)
 		}
 
 		testBuf.Reset()
@@ -660,34 +673,35 @@ func TestReadConfigValidated(t *testing.T) {
 
 		if test.env != nil {
 			for ei, ev := range test.env {
-				_ = os.Setenv(ei, ev)
+				t.Setenv(ei, ev)
 			}
 		}
 
-		var c *templig.Config[TestConfigValidated]
+		var config *templig.Config[TestConfigValidated]
 		var fromErr error
 
-		if len(test.in) > 0 {
-			c, fromErr = templig.From[TestConfigValidated](&testBuf)
-		} else if len(test.inFile) > 0 {
-			c, fromErr = templig.FromFile[TestConfigValidated](test.inFile)
-		} else {
-			t.Errorf("%v: neither input data nor input file given", k)
+		switch {
+		case len(test.in) > 0:
+			config, fromErr = templig.From[TestConfigValidated](&testBuf)
+		case len(test.inFile) > 0:
+			config, fromErr = templig.FromFile[TestConfigValidated](test.inFile)
+		default:
+			t.Errorf("%v: neither input data nor input file given", testNum)
 		}
 
 		if test.wantErr && fromErr == nil {
-			t.Errorf("%v: wanted error but got nil", k)
+			t.Errorf("%v: wanted error but got nil", testNum)
 		}
 		if !test.wantErr && fromErr != nil {
-			t.Errorf("%v: did not want error but got %v", k, fromErr)
+			t.Errorf("%v: did not want error but got %v", testNum, fromErr)
 		}
 
-		if c != nil {
-			if c.Get().ID != test.want.ID {
-				t.Errorf("%v: wanted ID %v but got %v", k, test.want.ID, c.Get().ID)
+		if config != nil {
+			if config.Get().ID != test.want.ID {
+				t.Errorf("%v: wanted ID %v but got %v", testNum, test.want.ID, config.Get().ID)
 			}
-			if c.Get().Name != test.want.Name {
-				t.Errorf("%v: wanted Name %v but got %v", k, test.want.Name, c.Get().Name)
+			if config.Get().Name != test.want.Name {
+				t.Errorf("%v: wanted Name %v but got %v", testNum, test.want.Name, config.Get().Name)
 			}
 		}
 

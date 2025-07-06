@@ -1,10 +1,9 @@
 // Copyright the templig contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+// Package main of the overlay example.
+// This example demonstrates the basic overlay function of templig.
 package main
-
-// This example demonstrates the basic function of templig,
-// namely the reading and deserialization of configuration files into an arbitrary data structure.
 
 import (
 	"fmt"
@@ -18,7 +17,7 @@ type Config struct {
 	Name string `yaml:"name"`
 }
 
-// main reads a configuration file with an overlay
+// main reads a configuration file with an overlay.
 func main() {
 	c, confErr := templig.FromFile[Config](
 		"my_config.yaml",

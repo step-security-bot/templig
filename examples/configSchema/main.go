@@ -1,3 +1,4 @@
+// Package main of the configSchema example.
 package main
 
 import (

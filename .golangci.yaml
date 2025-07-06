@@ -14,7 +14,12 @@ linters:
     default: all
 
     disable:
+        - exhaustruct
+        - forbidigo
+        - noinlineerr
+        - nonamedreturns
         - wsl
+        - wsl_v5
 
     exclusions:
         warn-unused: true
@@ -24,10 +29,15 @@ linters:
               linters:
                   - cyclop
                   - dupword
+                  - err113
                   - funlen
                   - gocognit
                   - maintidx
                   - nestif
+
+            - path: examples/
+              linters:
+                  - err113
 
     settings:
         cyclop:
@@ -38,26 +48,44 @@ linters:
                 main:
                     files:
                         - $all
-                        - "!**/*_test.go"
+                        - "!$test"
+                        - "!**/examples/**/*"
                     allow:
                         - $gostd
                         - gopkg.in/yaml.v3
                         - github.com/Masterminds/sprig/v3
                 test:
                     files:
-                        - "**/*_test.go"
+                        - $test
+                        - "**/examples/**/*"
                     allow:
                         - $gostd
                         - gopkg.in/yaml.v3
                         - github.com/Masterminds/sprig/v3
                         - github.com/AlphaOne1/templig
 
+        exhaustive:
+            default-signifies-exhaustive: true
+
         mnd:
             ignored-numbers:
-                - 2
+                - "2"
+
+        paralleltest:
+            ignore-missing: true
+
+        perfsprint:
+            errorf: false
 
         testpackage:
             skip-regexp: internal_test\.go
+
+        varnamelen:
+            max-distance: 10
+
+        whitespace:
+            multi-if: true
+            multi-func: true
 
 issues:
     max-issues-per-linter: 0

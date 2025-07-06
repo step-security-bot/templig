@@ -1,6 +1,7 @@
 // Copyright the templig contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+// Package templig is the main package of the configuration library.
 package templig
 
 import (
@@ -9,9 +10,19 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"text/template"
 
 	"gopkg.in/yaml.v3"
+)
+
+var (
+
+	// ErrNoConfigReaders indicates that no configuration readers were provided to the function.
+	ErrNoConfigReaders = errors.New("no configuration readers given")
+
+	// ErrNoConfigPaths indicates that no configuration file paths were provided where at least one is required.
+	ErrNoConfigPaths = errors.New("no configuration paths given")
 )
 
 // Validator is the interface to facility validity checks on configuration types.
@@ -57,10 +68,10 @@ func (c *Config[T]) overlay(r io.Reader) error {
 
 // overlayFile opens a given configuration file and loads it as an intermediate using the overlay function.
 func (c *Config[T]) overlayFile(path string) error {
-	f, err := os.Open(path)
+	f, err := os.Open(filepath.Clean(path))
 
 	if err != nil {
-		return err
+		return fmt.Errorf("could not open overlay file %v: %w", path, err)
 	}
 
 	defer func() { _ = f.Close() }()
@@ -71,93 +82,94 @@ func (c *Config[T]) overlayFile(path string) error {
 // fromSingle reads a configuration from the single given io.Reader and
 // runs - if necessary - the contained template functions.
 func fromSingle[T any](r io.Reader) (*Config[T], error) {
-	var c Config[T]
+	var config Config[T]
 	fileContent, err := io.ReadAll(r)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not read from reader: %w", err)
 	}
 
-	var t *template.Template
+	var tmpl *template.Template
 
-	if t, err = template.
+	if tmpl, err = template.
 		New("config").
 		Funcs(templigFunctions()).
 		Parse(string(fileContent)); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not parse template: %w", err)
 	}
 
 	var b bytes.Buffer
 
-	if err = t.Execute(&b, nil); err != nil {
-		return nil, err
+	if err = tmpl.Execute(&b, nil); err != nil {
+		return nil, fmt.Errorf("could not execute template: %w", err)
 	}
 
-	if decodeErr := yaml.NewDecoder(&b).Decode(&c.content); decodeErr != nil {
-		return nil, decodeErr
+	if decodeErr := yaml.NewDecoder(&b).Decode(&config.content); decodeErr != nil {
+		return nil, fmt.Errorf("could not parse configuration: %w", decodeErr)
 	}
 
-	return &c, nil
+	return &config, nil
 }
 
-// Validate checks if the configuration is valid, if the content fulfills the Validator interface.
+// Validate checks if the configuration is valid if the content fulfills the Validator interface.
 func (c *Config[T]) Validate() error {
-	switch v := any(&c.content).(type) {
-	case Validator:
-		return v.Validate()
+	if v, ok := any(&c.content).(Validator); ok {
+		if err := v.Validate(); err != nil {
+			return fmt.Errorf("validation failed: %w", err)
+		}
 	}
 
 	return nil
 }
 
 // From reads a configuration from the given set of io.Reader.
-func From[T any](r ...io.Reader) (*Config[T], error) {
-	if len(r) == 0 {
-		return nil, fmt.Errorf("no configuration readers given")
+func From[T any](readers ...io.Reader) (*Config[T], error) {
+	if len(readers) == 0 {
+		return nil, ErrNoConfigReaders
 	}
 
-	var c *Config[T]
+	var config *Config[T]
 	var decodeErr error
 	var validateErr error
 
-	if len(r) == 1 {
-		// optimize the most common case of a single reader, we do not need to
+	if len(readers) == 1 {
+		// to optimize the most common case of a single reader, we do not need to
 		// go over the yaml.Node structure first.
-		c, decodeErr = fromSingle[T](r[0])
+		config, decodeErr = fromSingle[T](readers[0])
 	} else {
-		c = new(Config[T])
+		config = new(Config[T])
 
-		for _, v := range r {
-			if err := c.overlay(v); err != nil {
+		for _, v := range readers {
+			if err := config.overlay(v); err != nil {
 				return nil, err
 			}
 		}
 
-		decodeErr = c.node.Decode(&c.content)
+		decodeErr = config.node.Decode(&config.content)
 
 		// cleanup
-		c.node = nil
+		config.node = nil
 	}
 
 	if decodeErr == nil {
-		validateErr = c.Validate()
+		validateErr = config.Validate()
 	}
 
 	if resultErr := errors.Join(decodeErr, validateErr); resultErr != nil {
 		return nil, resultErr
 	}
 
-	return c, nil
+	return config, nil
 }
 
 // To writes a configuration to the given io.Writer.
 func (c *Config[T]) To(w io.Writer) error {
-	return yaml.NewEncoder(w).Encode(&c.content)
+	return wrapError("could not encode configuration: %w", yaml.NewEncoder(w).Encode(&c.content))
 }
 
 // ToSecretsHidden writes the configuration to the given io.Writer and hides secret values using the [SecretRE].
 // Strings are replaced with the number of * corresponding to their length.
-// Substructures containing secrets, are replaced with a single '*'.
+// Substructures containing secrets are replaced with a single '*'.
 // The following example
 //
 //	id: id0
@@ -170,7 +182,7 @@ func (c *Config[T]) To(w io.Writer) error {
 //	id: id0
 //	secrets: *
 func (c *Config[T]) ToSecretsHidden(w io.Writer) error {
-	var writeErr error = nil
+	var writeErr error
 	node := yaml.Node{}
 
 	encodeErr := node.Encode(c.content)
@@ -186,7 +198,7 @@ func (c *Config[T]) ToSecretsHidden(w io.Writer) error {
 // ToSecretsHiddenStructured writes the configuration to the given io.Writer
 // and hides secret values using the [SecretRE].
 // Strings are replaced with the number of * corresponding to their length.
-// Substructures containing secrets, are replaced with a corresponding structure of '*'.
+// Substructures containing secrets are replaced with a corresponding structure of '*'.
 // The following example
 //
 //	id: id0
@@ -201,7 +213,7 @@ func (c *Config[T]) ToSecretsHidden(w io.Writer) error {
 //	  - *******
 //	  - *******
 func (c *Config[T]) ToSecretsHiddenStructured(w io.Writer) error {
-	var writeErr error = nil
+	var writeErr error
 	node := yaml.Node{}
 
 	encodeErr := node.Encode(c.content)
@@ -218,65 +230,65 @@ func (c *Config[T]) ToSecretsHiddenStructured(w io.Writer) error {
 // loaded on top of that one using the [MergeYAMLNodes] functionality.
 func FromFile[T any](paths ...string) (*Config[T], error) {
 	if len(paths) == 0 {
-		return nil, fmt.Errorf("no configuration paths given")
+		return nil, ErrNoConfigPaths
 	}
 
-	c := new(Config[T])
+	config := new(Config[T])
 	var decodeErr error
 	var validateErr error
 
 	if len(paths) == 1 {
-		// optimize the most common case of a single file, we do not need to
+		// to optimize the most common case of a single file, we do not need to
 		// go over the yaml.Node structure first.
 		f, err := os.Open(paths[0])
 
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("could not open %s: %w", paths[0], err)
 		}
 
 		defer func() { _ = f.Close() }()
 
-		c, decodeErr = fromSingle[T](f)
+		config, decodeErr = fromSingle[T](f)
 	} else {
 		for _, addOn := range paths[0:] {
-			aErr := c.overlayFile(addOn)
+			aErr := config.overlayFile(addOn)
 
 			if aErr != nil {
 				return nil, aErr
 			}
 		}
 
-		decodeErr = c.node.Decode(&c.content)
+		decodeErr = config.node.Decode(&config.content)
 
 		// cleanup
-		c.node = nil
+		config.node = nil
 	}
 
 	if decodeErr == nil {
-		validateErr = c.Validate()
+		validateErr = config.Validate()
 	}
 
 	if resultErr := errors.Join(decodeErr, validateErr); resultErr != nil {
 		return nil, resultErr
 	}
 
-	return c, nil
+	return config, nil
 }
 
 // FromFiles loads a series of configuration files. The first file is considered the base, all others are
 // loaded on top of that one using the [MergeYAMLNodes] functionality.
 //
-// Deprecated: As of version 0.6.0 this function is deprecated and will be removed in the next major release.
+// Deprecated: As of version 'v0.6.0' this function is deprecated and will be removed in the next major release.
 func FromFiles[T any](paths []string) (*Config[T], error) {
 	return FromFile[T](paths...)
 }
 
 // ToFile saves a configuration to a file with the given name, replacing it in case.
 func (c *Config[T]) ToFile(path string) error {
-	f, err := os.Create(path)
+	f, err := os.Create(filepath.Clean(path))
 
 	if err != nil {
-		return err
+		return fmt.Errorf("could not create file %s: %w", path, err)
 	}
 
 	defer func() { _ = f.Close() }()

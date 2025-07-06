@@ -8,6 +8,7 @@ import (
 	"io"
 	"maps"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"text/template"
@@ -16,9 +17,9 @@ import (
 )
 
 // TemplateFunctions is a template.FuncMap that allows to globally remove the additional templig template functions or
-// even add own functions on top of what is already provided. For user provided functions, please use the prefix `uP`,
+// even add own functions on top of what is already provided. For user-provided functions, please use the prefix `uP`,
 // that is guaranteed to never be used as a templig provided function.
-var TemplateFunctions = template.FuncMap{
+var TemplateFunctions = template.FuncMap{ //nolint:gochecknoglobals
 	"arg":      argumentValue,
 	"hasArg":   argumentPresent,
 	"required": required,
@@ -37,7 +38,7 @@ func templigFunctions() template.FuncMap {
 // required is a template function to indicate that the second argument cannot be empty or nil.
 func required(warn string, val any) (any, error) {
 	if s, ok := val.(string); val == nil || (ok && s == "") {
-		return val, errors.New(warn)
+		return val, errors.New(warn) //nolint:err113
 	}
 
 	return val, nil
@@ -47,7 +48,7 @@ func required(warn string, val any) (any, error) {
 // If the file does not exist, an empty string is generated, facilitating the use of `required` for customized
 // user interaction.
 func readFile(fileName string) (any, error) {
-	file, err := os.Open(fileName)
+	file, err := os.Open(filepath.Clean(fileName))
 
 	if err != nil {
 		return "", nil
