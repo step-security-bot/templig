@@ -605,6 +605,10 @@ func FuzzFromFileEnv(f *testing.F) {
 	f.Add("test")
 
 	f.Fuzz(func(t *testing.T, envVar string) {
+		if slices.Contains([]rune(envVar), 0) {
+			return
+		}
+
 		t.Setenv("PASS1", envVar)
 
 		_, confErr := templig.FromFile[TestConfig]("testData/test_config_1.yaml")
