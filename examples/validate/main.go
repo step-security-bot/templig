@@ -1,9 +1,9 @@
 // Copyright the templig contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-package main
-
+// Package main of the validation example.
 // This example demonstrates the use of the validation functionality.
+package main
 
 import (
 	"errors"

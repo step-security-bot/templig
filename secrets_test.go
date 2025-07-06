@@ -136,12 +136,12 @@ func TestHideSecrets(t *testing.T) {
 	gotBuf := bytes.Buffer{}
 	wantBuf := bytes.Buffer{}
 
-	for k, test := range tests {
+	for testNum, test := range tests {
 		node := yaml.Node{}
 		encodeErr := node.Encode(test.in)
 
 		if encodeErr != nil {
-			t.Errorf("%v: could not encode value", k)
+			t.Errorf("%v: could not encode value", testNum)
 
 			continue
 		}
@@ -149,14 +149,14 @@ func TestHideSecrets(t *testing.T) {
 		templig.HideSecrets(&node, test.hideStructure)
 
 		if err := yaml.NewEncoder(&gotBuf).Encode(&node); err != nil {
-			t.Errorf("%v: Got error serializing got", k)
+			t.Errorf("%v: Got error serializing got", testNum)
 		}
 		if err := yaml.NewEncoder(&wantBuf).Encode(test.want); err != nil {
-			t.Errorf("%v: Got error serializing want", k)
+			t.Errorf("%v: Got error serializing want", testNum)
 		}
 
 		if gotBuf.String() != wantBuf.String() {
-			t.Errorf("%v: got %v\nbut wanted %v", k, gotBuf.String(), wantBuf.String())
+			t.Errorf("%v: got %v\nbut wanted %v", testNum, gotBuf.String(), wantBuf.String())
 		}
 
 		gotBuf.Reset()
@@ -164,14 +164,14 @@ func TestHideSecrets(t *testing.T) {
 	}
 }
 
-func TestHideSecretsNil(t *testing.T) {
-	var a *yaml.Node = nil
+func TestHideSecretsNil( /* t */ *testing.T) {
+	var a *yaml.Node
 
 	templig.HideSecrets(a, true)
 }
 
 func TestHideSecretAlias(t *testing.T) {
-	in := `
+	input := `
 open: &ref |-
     value
 pass: *ref`
@@ -182,7 +182,7 @@ pass: *ref
 
 	node := &yaml.Node{}
 
-	if decodeErr := yaml.NewDecoder(bytes.NewBufferString(in)).Decode(node); decodeErr != nil {
+	if decodeErr := yaml.NewDecoder(bytes.NewBufferString(input)).Decode(node); decodeErr != nil {
 		t.Errorf("unexpted encode error: %v", decodeErr)
 
 		return

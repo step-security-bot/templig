@@ -1,10 +1,10 @@
 // Copyright the templig contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-package main
-
+// Package main of the templating function `read` example.
 // This example demonstrates the use of the `read` functions in a templated configuration.
 // The use of the `required` function is demonstrated in conjunction with `read`.
+package main
 
 import (
 	"fmt"

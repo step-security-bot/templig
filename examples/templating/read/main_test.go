@@ -7,6 +7,6 @@ import (
 	"testing"
 )
 
-func TestMainGood(t *testing.T) {
+func TestMainGood( /* t */ *testing.T) {
 	main()
 }

@@ -1,10 +1,10 @@
 // Copyright the templig contributors.
 // SPDX-License-Identifier: MPL-2.0
 
+// Package main of the templating function `hasArg` example.
+// This example demonstrates the use of the `hasArg` functions in a templated configuration.
+// It is used in conjunction with `required` and `env`.
 package main
-
-// This example demonstrates the use of the `env` functions in a templated configuration.
-// The use of the `required` function is demonstrated in conjunction with `env`.
 
 import (
 	"fmt"

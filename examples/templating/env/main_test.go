@@ -10,11 +10,11 @@ import (
 
 func TestMainGood(t *testing.T) {
 	os.Args = []string{"main"}
-	_ = os.Setenv("PASSWORD", "bogus")
+	t.Setenv("PASSWORD", "bogus")
 	main()
 }
 
-func TestMainBad(t *testing.T) {
+func TestMainBad( /* t */ *testing.T) {
 	os.Args = []string{"main"}
 	main()
 }

@@ -1,10 +1,10 @@
 // Copyright the templig contributors.
 // SPDX-License-Identifier: MPL-2.0
 
-package main
-
+// Package main of the simple example.
 // This example demonstrates the basic function of templig,
 // namely the reading and deserialization of configuration files into an arbitrary data structure.
+package main
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ type Config struct {
 	Name string `yaml:"name"`
 }
 
-// main reads a single configuration file
+// main reads a single configuration file.
 func main() {
 	c, confErr := templig.FromFile[Config]("my_config.yaml")
 

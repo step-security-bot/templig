@@ -112,30 +112,30 @@ a: &ref1
 		},
 	}
 
-	for k, v := range tests {
-		var an yaml.Node
-		var bn yaml.Node
+	for testNum, test := range tests {
+		var nodeA yaml.Node
+		var nodeB yaml.Node
 
-		v.want = v.want + "\n"
+		test.want += "\n"
 
-		if aErr := yaml.Unmarshal([]byte(v.a), &an); aErr != nil {
-			t.Errorf("%v - %v: could not unmarshal a: %v", k, v.name, aErr)
+		if aErr := yaml.Unmarshal([]byte(test.a), &nodeA); aErr != nil {
+			t.Errorf("%v - %v: could not unmarshal a: %v", testNum, test.name, aErr)
 		}
 
-		if bErr := yaml.Unmarshal([]byte(v.b), &bn); bErr != nil {
-			t.Errorf("%v - %v: could not unmarshal b: %v", k, v.name, bErr)
+		if bErr := yaml.Unmarshal([]byte(test.b), &nodeB); bErr != nil {
+			t.Errorf("%v - %v: could not unmarshal b: %v", testNum, test.name, bErr)
 		}
 
-		result, resultErr := templig.MergeYAMLNodes(&an, &bn)
+		result, resultErr := templig.MergeYAMLNodes(&nodeA, &nodeB)
 
-		if !v.wantErr && resultErr != nil {
-			t.Errorf("%v - %v: could not merge: %v", k, v.name, resultErr)
+		if !test.wantErr && resultErr != nil {
+			t.Errorf("%v - %v: could not merge: %v", testNum, test.name, resultErr)
 
 			continue
 		}
 
-		if v.wantErr && resultErr == nil {
-			t.Errorf("%v - %v: should not have been able to merge", k, v.name)
+		if test.wantErr && resultErr == nil {
+			t.Errorf("%v - %v: should not have been able to merge", testNum, test.name)
 
 			continue
 		}
@@ -150,21 +150,21 @@ a: &ref1
 
 		if err := yaml.NewEncoder(&buf).Encode(result.Content[0]); err != nil {
 			t.Errorf("%v - %v: could not marshal document to yaml: %v",
-				k, v.name, err)
+				testNum, test.name, err)
 		}
 
-		if buf.String() != v.want {
+		if buf.String() != test.want {
 			t.Errorf("%v - %v: result mismatch, wanted:\n%v\nbut got:\n%v",
-				k, v.name, v.want, buf.String())
+				testNum, test.name, test.want, buf.String())
 		}
 	}
 }
 
 func TestStrangeDocumentNodes(t *testing.T) {
-	a := yaml.Node{
+	nodeA := yaml.Node{
 		Kind: yaml.DocumentNode,
 	}
-	b := yaml.Node{
+	nodeB := yaml.Node{
 		Kind: yaml.DocumentNode,
 		Content: []*yaml.Node{
 			{
@@ -173,7 +173,7 @@ func TestStrangeDocumentNodes(t *testing.T) {
 		},
 	}
 
-	res, resErr := templig.MergeYAMLNodes(&a, &b)
+	res, resErr := templig.MergeYAMLNodes(&nodeA, &nodeB)
 
 	if res != nil {
 		t.Errorf("merging strange document nodes must produce nil")
