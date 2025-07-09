@@ -17,3 +17,8 @@ updates:
       directory: /
       schedule:
           interval: weekly
+
+    - package-ecosystem: gomod
+      directory: /examples/configSchema
+      schedule:
+        interval: daily
